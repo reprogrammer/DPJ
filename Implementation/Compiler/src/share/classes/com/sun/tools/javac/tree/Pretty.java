@@ -109,7 +109,7 @@ public class Pretty extends JCTree.Visitor {
     /**
      * Set if we need to DPJplicate this
      */
-    private boolean thisIsBogus = false;
+    protected boolean thisIsBogus = false;
     
     /** Set when we are producing source output.  If we're not
      *  producing source output, we can sometimes give more detail in
@@ -1968,7 +1968,7 @@ public class Pretty extends JCTree.Visitor {
     }
 
     // prints the brackets of a nested array in reverse order
-    private void printBrackets(JCArrayTypeTree tree) throws IOException {
+    protected void printBrackets(JCArrayTypeTree tree) throws IOException {
         JCTree elem;
         while (true) {
             elem = tree.elemtype;

@@ -249,7 +249,7 @@ public class Check {
      *  @param pos        Position to be used for error reporting.
      *  @param sym        The deprecated symbol.
      */ 
-    void warnDeprecated(DiagnosticPosition pos, Symbol sym) {
+    public void warnDeprecated(DiagnosticPosition pos, Symbol sym) {
 	if (!lint.isSuppressed(LintCategory.DEPRECATION))
 	    deprecationHandler.report(pos, "has.been.deprecated", sym, sym.location());
     }
@@ -852,7 +852,7 @@ public class Check {
     /** Visitor method: Validate a type expression, if it is not null, catching
      *  and reporting any completion failures.
      */
-    void validate(JCTree tree) {
+    public void validate(JCTree tree) {
 	try {
 	    if (tree != null) tree.accept(validator);
 	} catch (CompletionFailure ex) {

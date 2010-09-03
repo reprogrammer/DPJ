@@ -140,7 +140,7 @@ public class RPL {
 	return false;
     }
     
-    private boolean endsWithStar() {
+    protected boolean endsWithStar() {
 	return size() > 1 && elts.last() == RPLElement.STAR;
     }
     

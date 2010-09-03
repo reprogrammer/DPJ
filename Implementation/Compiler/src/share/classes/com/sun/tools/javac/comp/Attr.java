@@ -211,17 +211,17 @@ public class Attr extends JCTree.Visitor {
     protected static final Context.Key<Attr> attrKey =
         new Context.Key<Attr>();
 
-    final Name.Table names;
-    final Log log;
+    protected final Name.Table names;
+    protected final Log log;
     final protected Symtab syms;
     final Resolve rs;
-    final Check chk;
+    protected final Check chk;
     final MemberEnter memberEnter;
     final TreeMaker make;
     final ConstFold cfolder;
-    final Enter enter;
+    protected final Enter enter;
     final Target target;
-    final Types types;
+    protected final Types types;
     final Annotate annotate;
     final RPLs rpls;
 
@@ -383,7 +383,7 @@ public class Attr extends JCTree.Visitor {
 
     /** Switch: support generics?
      */
-    boolean allowGenerics;
+    protected boolean allowGenerics;
 
     /** Switch: allow variable-arity methods.
      */
@@ -425,7 +425,7 @@ public class Attr extends JCTree.Visitor {
      *  @param pkind    The expected kind (or: protokind) of the tree
      *  @param pt       The expected type (or: prototype) of the tree
      */
-    Type check(JCTree tree, Type owntype, int ownkind, int pkind, Type pt) {
+    protected Type check(JCTree tree, Type owntype, int ownkind, int pkind, Type pt) {
 	if (ownkind == VAR && pkind == RPL_ELT) {
 	    // OK, using a variable as a z region RPL element
 	} else
@@ -487,7 +487,7 @@ public class Attr extends JCTree.Visitor {
      *  We have to weed out selects from non-type names here.
      *  @param tree    The candidate tree.
      */
-    boolean isStaticReference(JCTree tree) {
+    protected boolean isStaticReference(JCTree tree) {
         if (tree.getTag() == JCTree.SELECT) {
             Symbol lsym = TreeInfo.symbol(((JCFieldAccess) tree).selected);
             if (lsym == null || lsym.kind != TYP) {
@@ -627,15 +627,15 @@ public class Attr extends JCTree.Visitor {
 
     /** Visitor argument: the currently expected proto-kind.
      */
-    int pkind;
+    protected int pkind;
 
     /** Visitor argument: the currently expected proto-type.
      */
-    Type pt;
+    protected Type pt;
 
     /** Visitor result: the computed type.
      */
-    Type result;
+    protected Type result;
 
     /** Visitor method: attribute a tree, catching any completion failure
      *  exceptions. Return the tree's type.
@@ -645,7 +645,7 @@ public class Attr extends JCTree.Visitor {
      *  @param pkind   The protokind visitor argument.
      *  @param pt      The prototype visitor argument.
      */
-    Type attribTree(JCTree tree, Env<AttrContext> env, int pkind, Type pt) {
+    protected Type attribTree(JCTree tree, Env<AttrContext> env, int pkind, Type pt) {
 	Env<AttrContext> prevEnv = this.env;
         int prevPkind = this.pkind;
         Type prevPt = this.pt;
@@ -682,7 +682,7 @@ public class Attr extends JCTree.Visitor {
 
     /** Derived visitor method: attribute a type tree.
      */
-    Type attribType(JCTree tree, Env<AttrContext> env) {
+    protected Type attribType(JCTree tree, Env<AttrContext> env) {
 	Type result = attribTree(tree, env, TYP, Type.noType);
         return result;
     }
@@ -695,7 +695,7 @@ public class Attr extends JCTree.Visitor {
 
     /** Attribute a list of expressions, returning a list of types.
      */
-    List<Type> attribExprs(List<JCExpression> trees, Env<AttrContext> env, Type pt) {
+    protected List<Type> attribExprs(List<JCExpression> trees, Env<AttrContext> env, Type pt) {
         ListBuffer<Type> ts = new ListBuffer<Type>();
         for (List<JCExpression> l = trees; l.nonEmpty(); l = l.tail)
             ts.append(attribExpr(l.head, env, pt));
@@ -2636,7 +2636,7 @@ public class Attr extends JCTree.Visitor {
          *  @param pkind      The set of expected kinds.
          *  @param pt         The expected type.
          */
-        Type checkId(JCTree tree,
+        protected Type checkId(JCTree tree,
                      Type site,
                      Symbol sym,
                      Env<AttrContext> env,
@@ -3594,7 +3594,7 @@ public class Attr extends JCTree.Visitor {
                 log.warning(TreeInfo.diagnosticPositionFor(svuid, tree), "constant.SVUID", c);
         }
 
-    private Type capture(Type type) {
+    protected Type capture(Type type) {
         return types.capture(type);
     }
     

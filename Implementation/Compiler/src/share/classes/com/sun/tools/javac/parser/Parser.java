@@ -212,7 +212,7 @@ public class Parser {
 
     /** The scanner used for lexical analysis.
      */
-    private Lexer S;
+    protected Lexer S;
 
     /** The factory to be used for abstract syntax tree construction.
      */
@@ -229,7 +229,7 @@ public class Parser {
     private Source source;
 
     /** The name table. */
-    private Name.Table names;
+    protected Name.Table names;
 
     /** Construct a parser from a given scanner, tree factory and log.
      */
@@ -384,7 +384,7 @@ public class Parser {
         }
     }
 
-    private JCErroneous syntaxError(int pos, String key, Object... arg) {
+    protected JCErroneous syntaxError(int pos, String key, Object... arg) {
         return syntaxError(pos, null, key, arg);
     }
 
@@ -547,7 +547,7 @@ public class Parser {
     /**
      * Ident = IDENTIFIER
      */
-    Name ident() {
+    protected Name ident() {
         if (S.token() == IDENTIFIER) {
             Name name = S.name();
             S.nextToken();
@@ -1716,7 +1716,7 @@ public class Parser {
 
     /** BracketsOpt = {"[" "]"}
      */
-    private JCExpression bracketsOpt(JCExpression t, boolean regionsAllowed) {
+    protected JCExpression bracketsOpt(JCExpression t, boolean regionsAllowed) {
         if (S.token() == LBRACKET) {
             int pos = S.pos();
             S.nextToken();
@@ -1726,7 +1726,7 @@ public class Parser {
         return t;
     }
 
-    private JCArrayTypeTree bracketsOptCont(JCExpression t, int pos,
+    protected JCArrayTypeTree bracketsOptCont(JCExpression t, int pos,
 	                                    boolean regionsAllowed) {
         accept(RBRACKET);
         DPJRegionPathList rpl = null;
@@ -1866,7 +1866,7 @@ public class Parser {
     /** ArrayCreatorRest = "[" ( "]" BracketsOpt ArrayInitializer
      *                         | Expression "]" {"[" Expression "]"} BracketsOpt )
      */
-    JCExpression arrayCreatorRest(int newpos, JCExpression elemtype) {
+    protected JCExpression arrayCreatorRest(int newpos, JCExpression elemtype) {
         accept(LBRACKET);
         if (S.token() == RBRACKET) {
             accept(RBRACKET);
@@ -1963,7 +1963,7 @@ public class Parser {
 
     /** ArrayInitializer = "{" [VariableInitializer {"," VariableInitializer}] [","] "}"
      */
-    JCExpression arrayInitializer(int newpos, JCExpression t) {
+    protected JCExpression arrayInitializer(int newpos, JCExpression t) {
         accept(LBRACE);
         ListBuffer<JCExpression> elems = new ListBuffer<JCExpression>();
         if (S.token() == COMMA) {
@@ -2864,7 +2864,7 @@ public class Parser {
     
     /** RPL := [ REGION ] RPLElement { ":" RPLElement }
      */
-    private JCTree.DPJRegionPathList rpl() {
+    protected JCTree.DPJRegionPathList rpl() {
 	if (S.token() == REGION) S.nextToken(); // optional 'region' marker
 	ListBuffer<JCTree.DPJRegionPathListElt> elts = lb();
         JCTree.DPJRegionPathListElt elt = null;
@@ -3543,7 +3543,7 @@ public class Parser {
      *  RPLParams := REGION Ident { "," [ REGION ] Ident }
      *  EffectParams := "effect" Ident { "," [ "effect" ] Ident }
      */
-    Pair<List<JCTypeParameter>, DPJParamInfo> typeRPLEffectParamsOpt() {
+    public Pair<List<JCTypeParameter>, DPJParamInfo> typeRPLEffectParamsOpt() {
 	if (S.token() == LT) {
             checkGenerics();
             S.nextToken();

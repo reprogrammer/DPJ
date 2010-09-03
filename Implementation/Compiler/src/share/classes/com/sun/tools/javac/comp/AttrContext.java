@@ -42,7 +42,7 @@ public class AttrContext {
 
     /** The scope of local symbols.
      */
-    Scope scope = null;
+    public Scope scope = null;
 
     /** The number of enclosing `static' modifiers.
      */
@@ -58,15 +58,15 @@ public class AttrContext {
 
     /** Are arguments to current function applications boxed into an array for varargs?
      */
-    boolean varArgs = false;
+    public boolean varArgs = false;
 
     /** A list of type variables that are all-quantifed in current context.
      */
-    List<Type> tvars = List.nil();
+    public List<Type> tvars = List.nil();
     
     /** A list of RPL variables that are all-quantifed in current context.
      */
-    List<RPL> rvars = List.nil();
+    public List<RPL> rvars = List.nil();
     
     /** Info about the method call site, used in method resolution
      */
@@ -86,7 +86,7 @@ public class AttrContext {
 
     /** Duplicate this context, replacing scope field and copying all others.
      */
-    AttrContext dup(Scope scope) {
+    public AttrContext dup(Scope scope) {
 	AttrContext info = new AttrContext();
 	info.scope = scope;
 	info.staticLevel = staticLevel;
