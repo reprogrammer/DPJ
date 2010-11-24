@@ -378,6 +378,8 @@ public class CheckEffects extends EnvScanner { // DPJ
 	}
 	// DPJizer: Set the effects of the method to those of its body.
 	m.effects = actualEffects;
+	// FIXME: Remove the following debug info.
+	System.out.println("Effects of " + tree.name + ":" + m.effects);
 	// if (!actualEffects.areSubeffectsOf(m.effects)) {
 	// System.err.println("Effect summary does not cover " +
 	// actualEffects.missingFrom(m.effects));
