@@ -4,6 +4,10 @@
 package com.sun.tools.javac.code.dpjizer;
 
 import com.sun.tools.javac.code.Symbol.VarSymbol;
+import com.sun.tools.javac.comp.AttrContext;
+import com.sun.tools.javac.comp.Env;
+import com.sun.tools.javac.comp.Resolve;
+import com.sun.tools.javac.tree.JCTree.DPJNegationExpression;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 
 /**
@@ -13,22 +17,30 @@ import com.sun.tools.javac.tree.JCTree.JCExpression;
  */
 public class IndexSubstitution implements Substitution {
 
-	VarSymbol varSymbol;
+    VarSymbol varSymbol;
 
-	JCExpression expression;
+    JCExpression expression;
 
-	public IndexSubstitution(VarSymbol varSym, JCExpression expression) {
-		super();
-		this.varSymbol = varSym;
-		this.expression = expression;
+    public IndexSubstitution(VarSymbol varSymbol, JCExpression expression) {
+	this.varSymbol = varSymbol;
+	this.expression = expression;
+    }
+
+    public Substitution inEnvironment(Resolve rs, Env<AttrContext> env) {
+	JCExpression resultingRPL = expression;
+	if (!rs.isInScope(expression, env)) {
+	    resultingRPL = new DPJNegationExpression(null);
 	}
+	return new IndexSubstitution(varSymbol, resultingRPL);
+    }
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(varSymbol.toString());
-		sb.append(" <- ");
-		sb.append(expression.toString());
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+	StringBuilder sb = new StringBuilder();
+	sb.append(varSymbol.toString());
+	sb.append(" <- ");
+	sb.append(expression.toString());
+	return sb.toString();
+    }
+
 }

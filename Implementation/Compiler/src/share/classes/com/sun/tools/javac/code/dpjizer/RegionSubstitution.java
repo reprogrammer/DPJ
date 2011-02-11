@@ -5,6 +5,9 @@ package com.sun.tools.javac.code.dpjizer;
 
 import com.sun.tools.javac.code.RPL;
 import com.sun.tools.javac.code.Symbol.RegionParameterSymbol;
+import com.sun.tools.javac.comp.AttrContext;
+import com.sun.tools.javac.comp.Env;
+import com.sun.tools.javac.comp.Resolve;
 
 /**
  * 
@@ -21,6 +24,11 @@ public class RegionSubstitution implements Substitution {
 	super();
 	this.regionParamSym = regionParamSym;
 	this.rpl = rpl;
+    }
+
+    public Substitution inEnvironment(Resolve rs, Env<AttrContext> env) {
+	return new RegionSubstitution(regionParamSym, rpl.inEnvironment(rs,
+		env, true));
     }
 
     @Override

@@ -369,7 +369,8 @@ public class CheckEffects extends EnvScanner { // DPJ
 	Effects actualEffects = Effects.UNKNOWN;
 	if (tree.body != null) {
 	    if (!inConstructor(childEnvs.head)) {
-		actualEffects = tree.body.effects.inEnvironment(rs,
+		Effects effectsInBodyEnv = tree.body.effects;
+		actualEffects = effectsInBodyEnv.inEnvironment(rs,
 			childEnvs.head, true);
 	    } else {
 		actualEffects = tree.body.getConstructorEffects()
@@ -377,7 +378,7 @@ public class CheckEffects extends EnvScanner { // DPJ
 	    }
 	}
 	// DPJizer: Set the effects of the method to those of its body.
-	m.effects = actualEffects;
+	m.effects = actualEffects.inEnvironment(rs, childEnvs.head, true);
 	// FIXME: Remove the following debug info.
 	System.out.println("Effects of " + tree.name + ":" + m.effects);
 	// if (!actualEffects.areSubeffectsOf(m.effects)) {

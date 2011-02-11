@@ -1,7 +1,5 @@
 package com.sun.tools.javac.code;
 
-import java.util.logging.Logger;
-
 import com.sun.tools.javac.code.RPLElement.ArrayIndexRPLElement;
 import com.sun.tools.javac.code.RPLElement.RPLCaptureParameter;
 import com.sun.tools.javac.code.RPLElement.VarRPLElement;
@@ -17,6 +15,7 @@ import com.sun.tools.javac.comp.AttrContext;
 import com.sun.tools.javac.comp.Env;
 import com.sun.tools.javac.comp.Resolve;
 import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.DPJNegationExpression;
 import com.sun.tools.javac.tree.JCTree.JCBinary;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCIdent;
@@ -346,6 +345,7 @@ public class RPL {
 	Symbol sym = tree.getSymbol();
 	if (sym != null)
 	    return symToRPL(sym);
+
 	RPL owner = tree.type.getOwner();
 
 	// DPJIZER: Replaced RPL result = new
@@ -564,6 +564,16 @@ public class RPL {
 
     }
 
+    private static RPL substitutionInEnvironment(RPL rpl, Resolve rs,
+	    Env<AttrContext> env) {
+	if (rpl == null) {
+	    return null;
+	} else {
+	    return new RPL(rpl.elts, rpl.substitutionChain.inEnvironment(rs,
+		    env));
+	}
+    }
+
     /**
      * Conform the RPL to an enclosing environment. An RPL may contain elements
      * written in terms of local region names and/ or local variables that are
@@ -583,11 +593,13 @@ public class RPL {
 	    if (includedIn == null)
 		return null;
 	    // Otherwise return new parameter only if bound changed
-	    return (includedIn == capture.includedIn) ? this :
-	    // DPJIZER
-	    // new RPL(List.<RPLElement> of(new
-	    // RPLCaptureParameter(includedIn)).appendList(elts.tail));
-		    replaceHeadBy(new RPL(new RPLCaptureParameter(includedIn)));
+	    return substitutionInEnvironment(
+		    (includedIn == capture.includedIn) ? this :
+		    // DPJIZER
+		    // new RPL(List.<RPLElement> of(new
+		    // RPLCaptureParameter(includedIn)).appendList(elts.tail));
+			    replaceHeadBy(new RPL(new RPLCaptureParameter(
+				    includedIn))), rs, env);
 	}
 	// If the RPL starts with a variable v that is out of scope, then
 	// replace the whole thing with R : *, where R is the owner parameter
@@ -616,9 +628,9 @@ public class RPL {
 	// Otherwise, replace E and all following elements with *.
 	for (RPLElement elt : elts) {
 	    if (!rs.isInScope(elt, env))
-		return this.truncateTo(elt);
+		return substitutionInEnvironment(this.truncateTo(elt), rs, env);
 	    if (pruneLocalEffects && elt.isLocalName())
-		return this.truncateTo(elt);
+		return substitutionInEnvironment(this.truncateTo(elt), rs, env);
 	    /*
 	     * if (elt instanceof StackRPLElement) { StackRPLElement sre =
 	     * (StackRPLElement) elt; if (!rs.isInScope(sre.sym, env)) return
@@ -640,8 +652,8 @@ public class RPL {
 	    }
 	    buf.append(elt);
 	}
-	// DPJIZER: TODO: What about substitutions?
-	return added ? new RPL(buf.toList()) : this;
+	return substitutionInEnvironment((added ? new RPL(buf.toList(),
+		substitutionChain) : this), rs, env);
     }
 
     RPL truncateTo(RPLElement elt) {
@@ -654,27 +666,27 @@ public class RPL {
 	if (buf.isEmpty())
 	    return null;
 	buf.append(RPLElement.STAR);
-	// DPJIZER: TODO: What about substitutions?
-	return new RPL(buf.toList());
+	return new RPL(buf.toList(), substitutionChain);
     }
 
     // /////////////////////////////////////////////////////////////////////////
 
-    //DPJIZER: The equality and hachCode of RPL's depends on their substitution.
-//    @Override
-//    public boolean equals(Object other) {
-//	if (this == other)
-//	    return true;
-//	else if (other != null && other instanceof RPL)
-//	    return this.elts.equals(((RPL) other).elts);
-//	else
-//	    return false;
-//    }
-//    @Override
-//    public int hashCode() {
-//	return elts.hashCode();
-//    }
-    
+    // DPJIZER: The equality and hachCode of RPL's depends on their
+    // substitution.
+    // @Override
+    // public boolean equals(Object other) {
+    // if (this == other)
+    // return true;
+    // else if (other != null && other instanceof RPL)
+    // return this.elts.equals(((RPL) other).elts);
+    // else
+    // return false;
+    // }
+    // @Override
+    // public int hashCode() {
+    // return elts.hashCode();
+    // }
+
     @Override
     public int hashCode() {
 	final int prime = 31;
