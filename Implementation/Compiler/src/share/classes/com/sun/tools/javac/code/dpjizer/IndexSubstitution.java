@@ -39,7 +39,11 @@ public class IndexSubstitution implements Substitution {
 	StringBuilder sb = new StringBuilder();
 	sb.append(varSymbol.toString());
 	sb.append(" <- ");
-	sb.append(expression.toString());
+	if (expression instanceof DPJNegationExpression) {
+	    sb.append("?");
+	} else {
+	    sb.append(expression.toString());
+	}
 	return sb.toString();
     }
 

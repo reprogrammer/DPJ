@@ -61,11 +61,6 @@ public class RPL {
     }
 
     public RPL(List<RPLElement> elts, SubstitutionChain substitutionChain) {
-	for (RPLElement rplElement : elts) {
-	    if (rplElement.getClass().toString().contains("RegionVarElt")) {
-		System.out.println("breakpoint");
-	    }
-	}
 	this.elts = elts;
 	this.substitutionChain = substitutionChain;
     }
