@@ -40,12 +40,12 @@ public class InferRPL {
     }
 
     public Type instantiateMethod(List<RPL> rvars, List<Type> tvars,
-	    MethodType mt, List<Type> actualtypes, Warner warn) {
+	    MethodType mt, List<Type> actualtypes, Warner warn, boolean createFreshRegionVars) {
 	ListBuffer<RPL> buf = ListBuffer.lb();
 	for (RPL rvar : rvars) {
 	    if (rvar.size() == 1 && rvar.elts.head instanceof RPLParameterElement)
 		buf.append(new RPL(new 
-			UndetRPLParameterElement(((RPLParameterElement) rvar.elts.head).sym)));
+			UndetRPLParameterElement(((RPLParameterElement) rvar.elts.head).sym, createFreshRegionVars)));
 	    else
 		buf.append(rvar);
 	}

@@ -436,14 +436,19 @@ public abstract class RPLElement {
      */
     public static class UndetRPLParameterElement extends RPLParameterElement {
 
-	public UndetRPLParameterElement(RegionParameterSymbol sym) {
+	public UndetRPLParameterElement(RegionParameterSymbol sym,
+		boolean createFreshRegionVars) {
 	    // DPJIZER: Replace Root:* by a region variable element. This region
 	    // variable gets used when a method with a region parameter is
 	    // invoked without providing an actual RPL.
 
 	    // super(sym, new RPL(List.<RPLElement>of(RPLElement.ROOT_ELEMENT,
 	    // RPLElement.STAR)));
-	    super(sym, new RPL(List.<RPLElement> of(new SimpleRegionVarElt())));
+	    super(sym, new RPL(
+		    createFreshRegionVars ? List
+			    .<RPLElement> of(new SimpleRegionVarElt()) : List
+			    .<RPLElement> of(RPLElement.ROOT_ELEMENT,
+				    RPLElement.STAR)));
 	}
 
 	public String toString() {
