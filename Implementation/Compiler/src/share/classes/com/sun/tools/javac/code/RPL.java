@@ -1,5 +1,6 @@
 package com.sun.tools.javac.code;
 
+import com.sun.mirror.declaration.Modifier;
 import com.sun.tools.javac.code.RPLElement.ArrayIndexRPLElement;
 import com.sun.tools.javac.code.RPLElement.RPLCaptureParameter;
 import com.sun.tools.javac.code.RPLElement.VarRPLElement;
@@ -459,7 +460,23 @@ public class RPL {
     // }
     // return new RPL(buf.toList());
     // }
+
+    private boolean isInt(VarSymbol var) {
+	return var.type.tag == TypeTags.INT;
+    }
+
+    private boolean isFinal(VarSymbol var) {
+	return var.getModifiers().contains(Modifier.FINAL);
+    }
+
+    private boolean canAppearInArrayIndexRPLElement(VarSymbol from) {
+	return (isInt(from)) || (from.toString().equals("_"));
+    }
+
     public RPL substIndex(VarSymbol from, JCExpression to) {
+	if (!(canAppearInArrayIndexRPLElement(from))) {
+	    return this;
+	}
 	return followedBy(new IndexSubstitution(from, to));
     }
 
