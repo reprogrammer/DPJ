@@ -368,8 +368,17 @@ public class Resolve {
 	    List<Effects> effectargs, boolean allowBoxing, boolean useVarargs,
 	    Warner warn, boolean createFreshRegionVars)
 	    throws Infer.NoInstanceException {
-	if (useVarargs && (m.flags() & VARARGS) == 0)
+	// DPJIZER: Set the flag to stop capturing constraints.
+	boolean originalCaptureInclusionConstraints = RPL.captureInclusionConstraints;
+	RPL.captureInclusionConstraints = createFreshRegionVars;
+
+	if (useVarargs && (m.flags() & VARARGS) == 0) {
+	    // DPJIZER: Restore the flag for capturing constraint to what it
+	    // was at the beginning of the method.
+	    RPL.captureInclusionConstraints = originalCaptureInclusionConstraints;
+
 	    return null;
+	}
 	Type mt = types.memberType(site, m);
 	List<VarSymbol> params = (m instanceof MethodSymbol) ? ((MethodSymbol) m)
 		.params() : null;
@@ -391,6 +400,11 @@ public class Resolve {
 	} else if (mt.tag == FORALL && typeargtypes.nonEmpty()) {
 	    ForAll pmt = (ForAll) mt;
 	    if (typeargtypes.length() != pmt.tvars.length()) {
+
+		// DPJIZER: Restore the flag for capturing constraint to what it
+		// was at the beginning of the method.
+		RPL.captureInclusionConstraints = originalCaptureInclusionConstraints;
+
 		return null;
 	    }
 	    // Check type arguments are within bounds
@@ -406,6 +420,11 @@ public class Resolve {
 		for (; bounds.nonEmpty(); bounds = bounds.tail)
 		    if (!types.isSubtypeUnchecked(actuals.head, bounds.head,
 			    warn)) {
+
+			// DPJIZER: Restore the flag for capturing constraint to
+			// what it was at the beginning of the method.
+			RPL.captureInclusionConstraints = originalCaptureInclusionConstraints;
+
 			return null;
 		    }
 		formals = formals.tail;
@@ -450,6 +469,10 @@ public class Resolve {
 	    mt = inferRPL.instantiateMethod(rvars, tvars, (MethodType) mt,
 		    argtypes, warn, createFreshRegionVars);
 	    if (mt == null) {
+		// DPJIZER: Restore the flag for capturing constraint to what it
+		// was at the beginning of the method.
+		RPL.captureInclusionConstraints = originalCaptureInclusionConstraints;
+
 		return null;
 	    }
 	} else {
@@ -465,6 +488,11 @@ public class Resolve {
 		((MethodType) result).regionActuals = regionargs;
 		((MethodType) result).effectactuals = effectargs;
 	    }
+
+	    // DPJIZER: Restore the flag for capturing constraint to what it
+	    // was at the beginning of the method.
+	    RPL.captureInclusionConstraints = originalCaptureInclusionConstraints;
+
 	    return result;
 	}
 	List<Type> paramTypes = mt.getParameterTypes();
@@ -478,8 +506,15 @@ public class Resolve {
 		    env.info.actualArgs);
 	}
 	((MethodType) mt).typeactuals = typeargtypes;
-	return argumentsAcceptable(argtypes, paramTypes, // mt.getParameterTypes(),
+
+	Type acceptableType = argumentsAcceptable(argtypes, paramTypes, // mt.getParameterTypes(),
 		allowBoxing, useVarargs, warn) ? mt : null;
+
+	// DPJIZER: Restore the flag for capturing constraint to what it
+	// was at the beginning of the method.
+	RPL.captureInclusionConstraints = originalCaptureInclusionConstraints;
+
+	return acceptableType;
     }
 
     /**

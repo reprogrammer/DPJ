@@ -17,9 +17,8 @@ import com.sun.tools.javac.util.ListBuffer;
 import com.sun.tools.javac.util.Warner;
 
 public class InferRPL {
-    
-    protected static final Context.Key<InferRPL> inferRPLKey =
-	new Context.Key<InferRPL>();
+
+    protected static final Context.Key<InferRPL> inferRPLKey = new Context.Key<InferRPL>();
 
     RPLs rpls;
     Types types;
@@ -40,45 +39,64 @@ public class InferRPL {
     }
 
     public Type instantiateMethod(List<RPL> rvars, List<Type> tvars,
-	    MethodType mt, List<Type> actualtypes, Warner warn, boolean createFreshRegionVars) {
+	    MethodType mt, List<Type> actualtypes, Warner warn,
+	    boolean createFreshRegionVars) {
+	// DPJIZER: Do not capture inclusion constraints generated in this
+	// method.
+	boolean originalCaptureInclusionConstraints = RPL.captureInclusionConstraints;
+	RPL.captureInclusionConstraints = false;
+
 	ListBuffer<RPL> buf = ListBuffer.lb();
 	for (RPL rvar : rvars) {
-	    if (rvar.size() == 1 && rvar.elts.head instanceof RPLParameterElement)
-		buf.append(new RPL(new 
-			UndetRPLParameterElement(((RPLParameterElement) rvar.elts.head).sym, createFreshRegionVars)));
+	    if (rvar.size() == 1
+		    && rvar.elts.head instanceof RPLParameterElement)
+		buf.append(new RPL(new UndetRPLParameterElement(
+			((RPLParameterElement) rvar.elts.head).sym,
+			createFreshRegionVars)));
 	    else
 		buf.append(rvar);
 	}
 	List<RPL> undetvars = buf.toList();
-	List<Type> formaltypes = types.substRPL(mt.argtypes, rpls.toParams(rvars), undetvars);
-	
+	List<Type> formaltypes = types.substRPL(mt.argtypes,
+		rpls.toParams(rvars), undetvars);
+
 	for (Type t : tvars) {
-	    formaltypes = types.subst(formaltypes, List.of(t), List.<Type>of(new UndetVar(t)));
+	    formaltypes = types.subst(formaltypes, List.of(t),
+		    List.<Type> of(new UndetVar(t)));
 	}
-	// Note:  This step fills in the bounds on the undet variables.  See RPL.isIncludedIn
-	// for details.  This is kind of a hack, but it makes for a very lean coding of the
-	// algorithm, i.e., no extra machinery is required to fill in the bounds.
+	// Note: This step fills in the bounds on the undet variables. See
+	// RPL.isIncludedIn
+	// for details. This is kind of a hack, but it makes for a very lean
+	// coding of the
+	// algorithm, i.e., no extra machinery is required to fill in the
+	// bounds.
 	if (!types.isSubtypesUnchecked(actualtypes, formaltypes, warn)) {
 	    return null;
 	}
 	buf = ListBuffer.lb();
 	for (RPL undetvar : undetvars) {
-	    if (undetvar.size() == 1 && 
-		    undetvar.elts.head instanceof UndetRPLParameterElement) {
+	    if (undetvar.size() == 1
+		    && undetvar.elts.head instanceof UndetRPLParameterElement) {
 		UndetRPLParameterElement element = (UndetRPLParameterElement) undetvar.elts.head;
 		if (element.includedIn == null)
-		    element.includedIn = 
-			new RPL(List.<RPLElement>of(RPLElement.ROOT_ELEMENT, RPLElement.STAR));
+		    element.includedIn = new RPL(List.<RPLElement> of(
+			    RPLElement.ROOT_ELEMENT, RPLElement.STAR));
 		buf.append(element.includedIn);
 	    } else {
 		buf.append(undetvar);
 	    }
 	}
-	//System.err.println("mt now ="+mt);
-	//System.err.println("rvars as params="+rpls.toParams(rvars));
-	//System.err.println("actuals="+buf.toList());
-	mt = (MethodType) types.substRPL(mt, rpls.toParams(rvars), buf.toList());
+	// System.err.println("mt now ="+mt);
+	// System.err.println("rvars as params="+rpls.toParams(rvars));
+	// System.err.println("actuals="+buf.toList());
+	mt = (MethodType) types
+		.substRPL(mt, rpls.toParams(rvars), buf.toList());
 	mt.regionActuals = buf.toList();
+
+	// DPJIZER: Do not capture inclusion constraints generated in this
+	// method.
+	RPL.captureInclusionConstraints = originalCaptureInclusionConstraints;
+
 	return mt;
     }
 }

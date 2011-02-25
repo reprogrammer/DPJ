@@ -39,7 +39,8 @@ public class RPL {
 
     // DPJIZER
     SubstitutionChain substitutionChain = SubstitutionChain.EMPTY;
-    public static boolean isCapturingConstraints = true;
+    public static boolean resultOfIsIncludedIn = true;
+    public static boolean captureInclusionConstraints = true;
 
     // /////////////////////////////////////////////////////////////////////////
     // Constructors
@@ -114,11 +115,6 @@ public class RPL {
     // return true;
     // return false;
     // }
-    // TODO: I need to figure out the nesting rules for RPLs that contain region
-    // variables.
-    public boolean isNestedUnder(RPL that) {
-	return isCapturingConstraints;
-    }
 
     /**
      * Does this RPL start with a local region name, or is it under an RPL that
@@ -175,13 +171,14 @@ public class RPL {
     // TODO: I need to figure out the rules for inclusion of RPLs that contain
     // region variables.
     public boolean isIncludedIn(RPL that) {
-	if (isCapturingConstraints) {
+	if (resultOfIsIncludedIn) {
 	    // constraints.add(new InclusionConstraint(this, that));
-	    System.out.println(this + " is assumed to be included in " + that);
+	    if (captureInclusionConstraints) {
+		System.out.println(this + " is assumed to be included in "
+			+ that);
+	    }
 	    return true;
 	} else {
-	    System.out.println(this + " is assumed not to be included in "
-		    + that);
 	    return false;
 	}
     }
@@ -190,12 +187,6 @@ public class RPL {
     // protected boolean endsWithStar() {
     // return size() > 1 && elts.last() == RPLElement.STAR;
     // }
-    // TODO: This is a hack to make every RPL included in RPLs that contain
-    // region variables.
-    protected boolean endsWithStar() {
-	System.out.println(this + " is assumed to end with star");
-	return isCapturingConstraints;
-    }
 
     private boolean isRoot() {
 	return size() == 1 && (elts.last() == RPLElement.ROOT_ELEMENT);
