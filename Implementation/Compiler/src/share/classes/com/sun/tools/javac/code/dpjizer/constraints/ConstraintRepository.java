@@ -5,6 +5,10 @@ package com.sun.tools.javac.code.dpjizer.constraints;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import com.google.inject.Inject;
 import com.sun.tools.javac.code.dpjizer.dirs.Dirs;
@@ -50,7 +54,8 @@ public class ConstraintRepository {
 	PrintWriter printWriter = null;
 	try {
 	    printWriter = new PrintWriter(dirs.getConstraintsFileName());
-	    for (Constraint constraint : constraints) {
+	    List<Constraint> sortedConstraints = constraints.sortedConstraints();
+	    for (Constraint constraint : sortedConstraints) {
 		printWriter.println(constraint);
 	    }
 	} catch (FileNotFoundException e) {

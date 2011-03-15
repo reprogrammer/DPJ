@@ -4,6 +4,7 @@
 package com.sun.tools.javac.code.dpjizer.constraints;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 
@@ -12,4 +13,6 @@ import java.util.Collection;
  */
 public interface Constraints extends Collection<Constraint> {
 
+    List<Constraint> sortedConstraints();
+    
 }
