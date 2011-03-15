@@ -1,5 +1,6 @@
 package com.sun.tools.javac.code;
 
+import com.google.inject.Inject;
 import com.sun.mirror.declaration.Modifier;
 import com.sun.tools.javac.code.RPLElement.ArrayIndexRPLElement;
 import com.sun.tools.javac.code.RPLElement.RPLCaptureParameter;
@@ -8,15 +9,16 @@ import com.sun.tools.javac.code.Symbol.RegionParameterSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type.ClassType;
 import com.sun.tools.javac.code.Type.TypeVar;
-import com.sun.tools.javac.code.dpjizer.IndexSubstitution;
-import com.sun.tools.javac.code.dpjizer.RegionSubstitution;
-import com.sun.tools.javac.code.dpjizer.Substitution;
-import com.sun.tools.javac.code.dpjizer.SubstitutionChain;
+import com.sun.tools.javac.code.dpjizer.constraints.ConstraintRepository;
+import com.sun.tools.javac.code.dpjizer.constraints.InclusionConstraint;
+import com.sun.tools.javac.code.dpjizer.substitutions.IndexSubstitution;
+import com.sun.tools.javac.code.dpjizer.substitutions.RegionSubstitution;
+import com.sun.tools.javac.code.dpjizer.substitutions.Substitution;
+import com.sun.tools.javac.code.dpjizer.substitutions.SubstitutionChain;
 import com.sun.tools.javac.comp.AttrContext;
 import com.sun.tools.javac.comp.Env;
 import com.sun.tools.javac.comp.Resolve;
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.JCTree.DPJNegationExpression;
 import com.sun.tools.javac.tree.JCTree.JCBinary;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCIdent;
@@ -174,6 +176,8 @@ public class RPL {
 	if (resultOfIsIncludedIn) {
 	    // constraints.add(new InclusionConstraint(this, that));
 	    if (captureInclusionConstraints) {
+		ConstraintRepository.getInstance().add(
+			new InclusionConstraint(this, that));
 		System.out.println(this + " is assumed to be included in "
 			+ that);
 	    }

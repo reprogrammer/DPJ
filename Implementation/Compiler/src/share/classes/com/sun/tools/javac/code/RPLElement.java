@@ -6,7 +6,7 @@ import com.sun.tools.javac.code.Symbol.RegionNameSymbol;
 import com.sun.tools.javac.code.Symbol.RegionParameterSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type.TypeVar;
-import com.sun.tools.javac.code.dpjizer.SimpleRegionVarElt;
+import com.sun.tools.javac.code.dpjizer.substitutions.SimpleRegionVarElt;
 import com.sun.tools.javac.tree.JCTree.DPJNegationExpression;
 import com.sun.tools.javac.tree.JCTree.JCBinary;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
