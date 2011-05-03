@@ -27,8 +27,7 @@ public class RegionSubstitution implements Substitution {
     }
 
     public Substitution inEnvironment(Resolve rs, Env<AttrContext> env) {
-	return new RegionSubstitution(regionParamSym, rpl.inEnvironment(rs,
-		env, true));
+	return new RegionSubstitution(regionParamSym, rpl.inEnvironment(rs, env, true));
     }
 
     @Override
