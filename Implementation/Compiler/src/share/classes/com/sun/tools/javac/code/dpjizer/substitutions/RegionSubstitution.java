@@ -21,13 +21,21 @@ public class RegionSubstitution implements Substitution {
     RPL rpl;
 
     public RegionSubstitution(RegionParameterSymbol regionParamSym, RPL rpl) {
-	super();
 	this.regionParamSym = regionParamSym;
 	this.rpl = rpl;
     }
 
+    public RegionParameterSymbol getLHS() {
+	return regionParamSym;
+    }
+
+    public RPL getRHS() {
+	return rpl;
+    }
+
     public Substitution inEnvironment(Resolve rs, Env<AttrContext> env) {
-	return new RegionSubstitution(regionParamSym, rpl.inEnvironment(rs, env, true));
+	return new RegionSubstitution(regionParamSym, rpl.inEnvironment(rs,
+		env, true));
     }
 
     @Override

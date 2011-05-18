@@ -1,6 +1,5 @@
 package com.sun.tools.javac.code;
 
-import com.google.inject.Inject;
 import com.sun.mirror.declaration.Modifier;
 import com.sun.tools.javac.code.RPLElement.ArrayIndexRPLElement;
 import com.sun.tools.javac.code.RPLElement.RPLCaptureParameter;
@@ -9,12 +8,22 @@ import com.sun.tools.javac.code.Symbol.RegionParameterSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type.ClassType;
 import com.sun.tools.javac.code.Type.TypeVar;
+import com.sun.tools.javac.code.dpjizer.constraints.CompositeConstraint;
+import com.sun.tools.javac.code.dpjizer.constraints.ConjunctiveConstraint;
+import com.sun.tools.javac.code.dpjizer.constraints.Constraint;
 import com.sun.tools.javac.code.dpjizer.constraints.ConstraintRepository;
+import com.sun.tools.javac.code.dpjizer.constraints.Constraints;
+import com.sun.tools.javac.code.dpjizer.constraints.ConstraintsSet;
+import com.sun.tools.javac.code.dpjizer.constraints.DisjunctiveConstraint;
 import com.sun.tools.javac.code.dpjizer.constraints.InclusionConstraint;
+import com.sun.tools.javac.code.dpjizer.constraints.RPLElementEqualityConstraint;
+import com.sun.tools.javac.code.dpjizer.constraints.RegionVarElt;
 import com.sun.tools.javac.code.dpjizer.substitutions.IndexSubstitution;
 import com.sun.tools.javac.code.dpjizer.substitutions.RegionSubstitution;
+import com.sun.tools.javac.code.dpjizer.substitutions.RegionVariableElement;
 import com.sun.tools.javac.code.dpjizer.substitutions.Substitution;
 import com.sun.tools.javac.code.dpjizer.substitutions.SubstitutionChain;
+import com.sun.tools.javac.code.dpjizer.substitutions.Substitutions;
 import com.sun.tools.javac.comp.AttrContext;
 import com.sun.tools.javac.comp.Env;
 import com.sun.tools.javac.comp.Resolve;
@@ -763,4 +772,91 @@ public class RPL {
 	return false;
     }
 
+    // DPJIZER
+    public RPL withoutLastSubstitutions() {
+	return new RPL(elts, substitutionChain.withoutLastSubstitutions());
+    }
+
+    private boolean hasSubstitutionChain() {
+	return !substitutionChain.isEmpty();
+    }
+
+    public boolean doesContainRPLElement(RPLElement rplElement) {
+	for (RPLElement e : elts) {
+	    if (e.equals(rplElement)) {
+		return true;
+	    }
+	}
+	return false;
+    }
+
+    public Constraint shouldContainRPLElement(RPLElement rplElement) {
+	if (toString().contains("idx3")) {
+	    System.out.println("contains idx3");
+	}
+	System.out.println(this + " should contain " + rplElement);
+	Constraints result = new ConstraintsSet();
+	if (!hasSubstitutionChain()) {
+	    if (doesContainRPLElement(rplElement)) {
+		return CompositeConstraint.ALWAYS_TRUE;
+	    } else {
+		for (RPLElement e : elts) {
+		    if (e instanceof RegionVariableElement) {
+			RegionVariableElement regionVarElt = (RegionVariableElement) e;
+			result.add(new RPLElementEqualityConstraint(
+				regionVarElt, rplElement));
+		    }
+		}
+		
+		//TODO:Remove
+		if (result.isEmpty()) {
+		    System.out.println("result is empty");
+		}
+		return DisjunctiveConstraint.newDisjunctiveConstraint(result);
+	    }
+	}
+
+	RPL rplWithoutLastSubstitutions = withoutLastSubstitutions();
+	result.add(rplWithoutLastSubstitutions
+		.shouldContainRPLElement(rplElement));
+
+	Substitutions lastSubstitutions = substitutionChain
+		.getLastSubstitutions();
+	for (Substitution substitution : lastSubstitutions.getSubstitutions()) {
+	    if (substitution instanceof RegionSubstitution) {
+		RegionSubstitution regionSubstitution = (RegionSubstitution) substitution;
+		RegionParameterSymbol lhs = regionSubstitution.getLHS();
+		RPL rhs = regionSubstitution.getRHS();
+		Constraint rplElementInRHS = rhs
+			.shouldContainRPLElement(rplElement);
+		Constraint lhsInRest = rplWithoutLastSubstitutions
+			.shouldContainRPLElement(new RPLElement.RPLParameterElement(
+				lhs));
+		Constraints constraints = new ConstraintsSet();
+		constraints.add(rplElementInRHS);
+		constraints.add(lhsInRest);
+		result.add(ConjunctiveConstraint
+			.newConjunctiveConstraint(constraints));
+	    } else if (substitution instanceof IndexSubstitution) {
+		IndexSubstitution indexSubstitution = (IndexSubstitution) substitution;
+		VarSymbol lhs = indexSubstitution.getLHS();
+		JCExpression rhs = indexSubstitution.getRHS();
+		RPLElement.ArrayIndexRPLElement rhsRPLElement = new RPLElement.ArrayIndexRPLElement(
+			rhs);
+		// FIXME: We have to handle substitutions such as [idx <- j + 1]
+		if (rhsRPLElement.equals(rplElement) || indexSubstitution.isRHSAnyIndex()) {
+		    Constraint lhsInRest = rplWithoutLastSubstitutions
+			    .shouldContainRPLElement(new RPLElement.VarRPLElement(
+				    lhs));
+		    result.add(lhsInRest);
+		}
+	    }
+	}
+
+	//TODO:Remove
+	if (result.isEmpty()) {
+	    System.out.println("result is empty");
+	}
+	return DisjunctiveConstraint.newDisjunctiveConstraint(result);
+    }
 }

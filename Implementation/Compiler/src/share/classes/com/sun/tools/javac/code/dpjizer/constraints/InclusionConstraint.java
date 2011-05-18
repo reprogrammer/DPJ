@@ -12,18 +12,50 @@ import com.sun.tools.javac.code.RPL;
  */
 public class InclusionConstraint implements Constraint {
 
-	RPL contained;
-	RPL container;
+    RPL contained;
+    RPL container;
 
-	public InclusionConstraint(RPL contained, RPL container) {
-		super();
-		this.contained = contained;
-		this.container = container;
-	}
+    public InclusionConstraint(RPL contained, RPL container) {
+	this.contained = contained;
+	this.container = container;
+    }
 
-	@Override
-	public String toString() {
-		return contained + " is in " + container;
-	}
+    @Override
+    public String toString() {
+	return contained + " is in " + container;
+    }
+
+    @Override
+    public int hashCode() {
+	final int prime = 31;
+	int result = 1;
+	result = prime * result
+		+ ((contained == null) ? 0 : contained.hashCode());
+	result = prime * result
+		+ ((container == null) ? 0 : container.hashCode());
+	return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj)
+	    return true;
+	if (obj == null)
+	    return false;
+	if (getClass() != obj.getClass())
+	    return false;
+	InclusionConstraint other = (InclusionConstraint) obj;
+	if (contained == null) {
+	    if (other.contained != null)
+		return false;
+	} else if (!contained.equals(other.contained))
+	    return false;
+	if (container == null) {
+	    if (other.container != null)
+		return false;
+	} else if (!container.equals(other.container))
+	    return false;
+	return true;
+    }
 
 }

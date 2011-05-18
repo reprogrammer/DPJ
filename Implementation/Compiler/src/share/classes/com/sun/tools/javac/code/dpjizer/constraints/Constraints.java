@@ -14,5 +14,9 @@ import java.util.List;
 public interface Constraints extends Collection<Constraint> {
 
     List<Constraint> sortedConstraints();
-    
+
+    boolean equals(Object o);
+
+    int hashCode();
+
 }

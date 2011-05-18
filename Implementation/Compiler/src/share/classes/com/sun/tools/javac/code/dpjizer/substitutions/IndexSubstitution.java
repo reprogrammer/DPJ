@@ -26,6 +26,18 @@ public class IndexSubstitution implements Substitution {
 	this.expression = expression;
     }
 
+    public VarSymbol getLHS() {
+	return varSymbol;
+    }
+
+    public JCExpression getRHS() {
+	return expression;
+    }
+
+    public boolean isRHSAnyIndex() {
+	return getRHS() instanceof DPJNegationExpression;
+    }
+
     public Substitution inEnvironment(Resolve rs, Env<AttrContext> env) {
 	JCExpression resultingRPL = expression;
 	if (!rs.isInScope(expression, env)) {

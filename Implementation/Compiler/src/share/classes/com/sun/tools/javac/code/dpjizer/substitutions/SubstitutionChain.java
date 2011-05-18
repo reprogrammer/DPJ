@@ -63,6 +63,25 @@ public class SubstitutionChain {
 	return newSubstitutionChain;
     }
 
+    public boolean isEmpty() {
+	return chain.size() == 0;
+    }
+
+    public Substitutions getLastSubstitutions() {
+	if (isEmpty()) {
+	    return Substitutions.EMPTY;
+	}
+	return chain.get(chain.size() - 1);
+    }
+
+    public SubstitutionChain withoutLastSubstitutions() {
+	if (isEmpty()) {
+	    return this;
+	} else {
+	    return new SubstitutionChain(chain.subList(0, chain.size() - 1));
+	}
+    }
+
     @Override
     public String toString() {
 	StringBuilder sb = new StringBuilder();

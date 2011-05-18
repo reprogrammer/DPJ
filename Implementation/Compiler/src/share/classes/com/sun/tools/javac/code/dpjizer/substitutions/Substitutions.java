@@ -4,6 +4,7 @@
 package com.sun.tools.javac.code.dpjizer.substitutions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,6 +20,12 @@ import com.sun.tools.javac.comp.Resolve;
 public class Substitutions {
 
     List<Substitution> substitutions = new ArrayList<Substitution>();
+
+    public static Substitutions EMPTY = new Substitutions();
+
+    protected Substitutions() {
+
+    }
 
     public Substitutions(Substitution substitution) {
 	add(substitution);
@@ -38,6 +45,14 @@ public class Substitutions {
 	    substitutions.add(substitution.inEnvironment(rs, env));
 	}
 	return new Substitutions(substitutions);
+    }
+
+    public List<Substitution> getSubstitutions() {
+	return Collections.unmodifiableList(substitutions);
+    }
+
+    public boolean isEmpty() {
+	return substitutions.size() == 0;
     }
 
     @Override
