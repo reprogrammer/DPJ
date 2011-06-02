@@ -791,9 +791,6 @@ public class RPL {
     }
 
     public Constraint shouldContainRPLElement(RPLElement rplElement) {
-	if (toString().contains("idx3")) {
-	    System.out.println("contains idx3");
-	}
 	System.out.println(this + " should contain " + rplElement);
 	Constraints result = new ConstraintsSet();
 	if (!hasSubstitutionChain()) {
@@ -803,15 +800,12 @@ public class RPL {
 		for (RPLElement e : elts) {
 		    if (e instanceof RegionVariableElement) {
 			RegionVariableElement regionVarElt = (RegionVariableElement) e;
-			result.add(new RPLElementEqualityConstraint(
-				regionVarElt, rplElement));
+			result.add(RPLElementEqualityConstraint
+				.newRPLElementEqualityConstraint(regionVarElt,
+					rplElement));
 		    }
 		}
-		
-		//TODO:Remove
-		if (result.isEmpty()) {
-		    System.out.println("result is empty");
-		}
+
 		return DisjunctiveConstraint.newDisjunctiveConstraint(result);
 	    }
 	}
@@ -844,7 +838,8 @@ public class RPL {
 		RPLElement.ArrayIndexRPLElement rhsRPLElement = new RPLElement.ArrayIndexRPLElement(
 			rhs);
 		// FIXME: We have to handle substitutions such as [idx <- j + 1]
-		if (rhsRPLElement.equals(rplElement) || indexSubstitution.isRHSAnyIndex()) {
+		if (rhsRPLElement.equals(rplElement)
+			|| indexSubstitution.isRHSAnyIndex()) {
 		    Constraint lhsInRest = rplWithoutLastSubstitutions
 			    .shouldContainRPLElement(new RPLElement.VarRPLElement(
 				    lhs));
@@ -853,10 +848,6 @@ public class RPL {
 	    }
 	}
 
-	//TODO:Remove
-	if (result.isEmpty()) {
-	    System.out.println("result is empty");
-	}
 	return DisjunctiveConstraint.newDisjunctiveConstraint(result);
     }
 }

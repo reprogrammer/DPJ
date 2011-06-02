@@ -3000,8 +3000,8 @@ public class Attr extends JCTree.Visitor {
 	// Resolve.instantiate from the symbol's type as well as
 	// any region args, type arguments, and value arguments.
 	noteWarner.warned = false;
-	Type owntype = rs.instantiate(env, site, sym, argtypes, typeargtypes,
-		regionargs, effectargs, true, useVarargs, noteWarner);
+	Type owntype = rs.instantiate(names, env, site, sym, argtypes,
+		typeargtypes, regionargs, effectargs, true, useVarargs, noteWarner);
 	boolean warned = noteWarner.warned;
 
 	// If this fails, something went wrong; we should not have

@@ -14,6 +14,7 @@ import com.sun.tools.javac.code.Type.UndetVar;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.ListBuffer;
+import com.sun.tools.javac.util.Name.Table;
 import com.sun.tools.javac.util.Warner;
 
 public class InferRPL {
@@ -38,9 +39,9 @@ public class InferRPL {
 	syms = Symtab.instance(context);
     }
 
-    public Type instantiateMethod(List<RPL> rvars, List<Type> tvars,
-	    MethodType mt, List<Type> actualtypes, Warner warn,
-	    boolean createFreshRegionVars) {
+    public Type instantiateMethod(Table names, Env<AttrContext> env,
+	    List<RPL> rvars, List<Type> tvars, MethodType mt,
+	    List<Type> actualtypes, Warner warn, boolean createFreshRegionVars) {
 	// DPJIZER: Do not capture inclusion constraints generated in this
 	// method.
 	boolean originalCaptureInclusionConstraints = RPL.captureInclusionConstraints;
@@ -50,9 +51,7 @@ public class InferRPL {
 	for (RPL rvar : rvars) {
 	    if (rvar.size() == 1
 		    && rvar.elts.head instanceof RPLParameterElement)
-		buf.append(new RPL(new UndetRPLParameterElement(
-			((RPLParameterElement) rvar.elts.head).sym,
-			createFreshRegionVars)));
+		buf.append(new RPL(new UndetRPLParameterElement(names, env, ((RPLParameterElement) rvar.elts.head).sym, createFreshRegionVars)));
 	    else
 		buf.append(rvar);
 	}

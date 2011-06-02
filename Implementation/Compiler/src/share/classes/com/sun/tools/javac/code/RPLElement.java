@@ -6,7 +6,9 @@ import com.sun.tools.javac.code.Symbol.RegionNameSymbol;
 import com.sun.tools.javac.code.Symbol.RegionParameterSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type.TypeVar;
-import com.sun.tools.javac.code.dpjizer.substitutions.SimpleRegionVarElt;
+import com.sun.tools.javac.code.dpjizer.constraints.RegionVarElt;
+import com.sun.tools.javac.comp.AttrContext;
+import com.sun.tools.javac.comp.Env;
 import com.sun.tools.javac.tree.JCTree.DPJNegationExpression;
 import com.sun.tools.javac.tree.JCTree.JCBinary;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
@@ -14,6 +16,7 @@ import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
 import com.sun.tools.javac.tree.JCTree.JCIdent;
 import com.sun.tools.javac.tree.JCTree.JCLiteral;
 import com.sun.tools.javac.util.List;
+import com.sun.tools.javac.util.Name.Table;
 import com.sun.tools.javac.util.Pair;
 
 /**
@@ -346,6 +349,16 @@ public abstract class RPLElement {
 	    }
 	    return false;
 	}
+
+	@Override
+	public Symbol getSymbol() {
+	    // FIXME: This is hack to be able to check if an RPL element such as
+	    // [j] is visible from the scope of a region variable.
+	    // The problem is that this hack doesn't support more complicated
+	    // array index RPL elements such as [i+j].
+	    return indexExp.getSymbol();
+	}
+
     }
 
     /**
@@ -436,8 +449,8 @@ public abstract class RPLElement {
      */
     public static class UndetRPLParameterElement extends RPLParameterElement {
 
-	public UndetRPLParameterElement(RegionParameterSymbol sym,
-		boolean createFreshRegionVars) {
+	public UndetRPLParameterElement(Table names, Env<AttrContext> env,
+		RegionParameterSymbol sym, boolean createFreshRegionVars) {
 	    // DPJIZER: Replace Root:* by a region variable element. This region
 	    // variable gets used when a method with a region parameter is
 	    // invoked without providing an actual RPL.
@@ -445,9 +458,9 @@ public abstract class RPLElement {
 	    // super(sym, new RPL(List.<RPLElement>of(RPLElement.ROOT_ELEMENT,
 	    // RPLElement.STAR)));
 	    super(sym, new RPL(
-		    createFreshRegionVars ? List
-			    .<RPLElement> of(new SimpleRegionVarElt()) : List
-			    .<RPLElement> of(RPLElement.ROOT_ELEMENT,
+		    createFreshRegionVars ? List.<RPLElement> of(RegionVarElt
+			    .getFreshRegionVarElt(names, env))
+			    : List.<RPLElement> of(RPLElement.ROOT_ELEMENT,
 				    RPLElement.STAR)));
 	}
 

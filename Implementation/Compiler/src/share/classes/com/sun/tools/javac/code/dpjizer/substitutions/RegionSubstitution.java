@@ -3,6 +3,8 @@
  */
 package com.sun.tools.javac.code.dpjizer.substitutions;
 
+import junit.framework.AssertionFailedError;
+
 import com.sun.tools.javac.code.RPL;
 import com.sun.tools.javac.code.Symbol.RegionParameterSymbol;
 import com.sun.tools.javac.comp.AttrContext;
@@ -21,6 +23,9 @@ public class RegionSubstitution implements Substitution {
     RPL rpl;
 
     public RegionSubstitution(RegionParameterSymbol regionParamSym, RPL rpl) {
+	if (rpl == null || regionParamSym == null) {
+	    throw new AssertionError("Expected the region parameter and the RPL of the substition to be nonnull.");
+	}
 	this.regionParamSym = regionParamSym;
 	this.rpl = rpl;
     }

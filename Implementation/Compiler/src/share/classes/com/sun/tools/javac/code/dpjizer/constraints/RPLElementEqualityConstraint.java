@@ -3,8 +3,15 @@
  */
 package com.sun.tools.javac.code.dpjizer.constraints;
 
+import com.google.inject.Inject;
+import com.sun.source.util.TreePath;
+import com.sun.tools.javac.api.JavacTrees;
 import com.sun.tools.javac.code.RPLElement;
 import com.sun.tools.javac.code.dpjizer.substitutions.RegionVariableElement;
+import com.sun.tools.javac.comp.AttrContext;
+import com.sun.tools.javac.comp.Env;
+import com.sun.tools.javac.comp.Resolve;
+import com.sun.tools.javac.util.Context;
 
 /**
  * 
@@ -17,10 +24,35 @@ public class RPLElementEqualityConstraint implements Constraint {
     RegionVariableElement regionVariableElement;
     RPLElement rplElement;
 
-    public RPLElementEqualityConstraint(
+    public static Context context;
+
+    private RPLElementEqualityConstraint(
 	    RegionVariableElement regionVariableElement, RPLElement rplElement) {
 	this.regionVariableElement = regionVariableElement;
 	this.rplElement = rplElement;
+    }
+
+    public static Constraint newRPLElementEqualityConstraint(
+	    RegionVariableElement regionVariableElement, RPLElement rplElement) {
+	if (canBeEqual(regionVariableElement, rplElement)) {
+	    return new RPLElementEqualityConstraint(regionVariableElement,
+		    rplElement);
+	} else {
+	    return CompositeConstraint.ALWAYS_FALSE;
+	}
+    }
+
+    private static boolean canBeEqual(
+	    RegionVariableElement regionVariableElement, RPLElement rplElement) {
+
+	if (context == null) {
+	    throw new AssertionError("Expected a valid context.");
+	}
+
+	Resolve resolve = Resolve.instance(context);
+	boolean isRPLElementInScopeOfRegionVariable = resolve.dpjizerIsInScope(
+		rplElement, regionVariableElement.getEnv());
+	return isRPLElementInScopeOfRegionVariable;
     }
 
     @Override

@@ -9,6 +9,8 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.RPLElementSymbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Types;
+import com.sun.tools.javac.comp.AttrContext;
+import com.sun.tools.javac.comp.Env;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Position;
 
@@ -28,8 +30,15 @@ public class RegionVarEltSymbol extends RPLElementSymbol {
 
 	public static int numIDs = 1;
 	public int ID = 0;
+	
+	public Env<AttrContext> env;
 
-	public RegionVarEltSymbol(long flags, Name name, Symbol owner) {
+	public RegionVarEltSymbol(long flags, Name name, Symbol owner, Env<AttrContext> env) {
+	    this(flags, name, owner);
+	    this.env = env;
+	}
+
+	private RegionVarEltSymbol(long flags, Name name, Symbol owner) {
 		super(RPL_ELT, flags, name, owner);
 		this.ID = numIDs++;
 	}

@@ -104,6 +104,7 @@ import com.sun.tools.javac.util.JCDiagnostic;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Name;
+import com.sun.tools.javac.util.Name.Table;
 import com.sun.tools.javac.util.Options;
 import com.sun.tools.javac.util.Warner;
 import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
@@ -346,6 +347,8 @@ public class Resolve {
      * treat site as an additional parameter and the parameters of the class
      * containing the method as additional type variables that get instantiated.
      * 
+     * @param names
+     *            TODO
      * @param env
      *            The current environment
      * @param site
@@ -363,7 +366,7 @@ public class Resolve {
      * @param useVarargs
      *            Box trailing arguments into an array for varargs.
      */
-    Type rawInstantiate(Env<AttrContext> env, Type site, Symbol m,
+    Type rawInstantiate(Table names, Env<AttrContext> env, Type site, Symbol m,
 	    List<Type> argtypes, List<Type> typeargtypes, List<RPL> regionargs,
 	    List<Effects> effectargs, boolean allowBoxing, boolean useVarargs,
 	    Warner warn, boolean createFreshRegionVars)
@@ -466,8 +469,8 @@ public class Resolve {
 	}
 
 	if (RPLInstNeeded) {
-	    mt = inferRPL.instantiateMethod(rvars, tvars, (MethodType) mt,
-		    argtypes, warn, createFreshRegionVars);
+	    mt = inferRPL.instantiateMethod(names, env, rvars, tvars,
+		    (MethodType) mt, argtypes, warn, createFreshRegionVars);
 	    if (mt == null) {
 		// DPJIZER: Restore the flag for capturing constraint to what it
 		// was at the beginning of the method.
@@ -519,13 +522,16 @@ public class Resolve {
 
     /**
      * Same but returns null instead throwing a NoInstanceException
+     * 
+     * @param names
+     *            TODO
      */
-    Type instantiate(Env<AttrContext> env, Type site, Symbol m,
+    Type instantiate(Table names, Env<AttrContext> env, Type site, Symbol m,
 	    List<Type> argtypes, List<Type> typeargtypes, List<RPL> regionargs,
 	    List<Effects> effectargs, boolean allowBoxing, boolean useVarargs,
 	    Warner warn) {
 	try {
-	    return rawInstantiate(env, site, m, argtypes, typeargtypes,
+	    return rawInstantiate(names, env, site, m, argtypes, typeargtypes,
 		    regionargs, effectargs, allowBoxing, useVarargs, warn, true);
 	} catch (Infer.NoInstanceException ex) {
 	    return null;
@@ -872,7 +878,7 @@ public class Resolve {
 	    return bestSoFar;
 	assert sym.kind < AMBIGUOUS;
 	try {
-	    if (rawInstantiate(env, site, sym, argtypes, typeargtypes,
+	    if (rawInstantiate(names, env, site, sym, argtypes, typeargtypes,
 		    regionargs, effectargs, allowBoxing, useVarargs,
 		    Warner.noWarnings, false) == null) {
 		// inapplicable
@@ -927,19 +933,19 @@ public class Resolve {
 		return m1;
 	    Type mt1 = types.memberType(site, m1);
 	    noteWarner.unchecked = false;
-	    boolean m1SignatureMoreSpecific = (instantiate(env, site, m2,
-		    types.lowerBoundArgtypes(mt1), null, null, null,
+	    boolean m1SignatureMoreSpecific = (instantiate(names, env, site,
+		    m2, types.lowerBoundArgtypes(mt1), null, null, null,
 		    allowBoxing, false, noteWarner) != null || useVarargs
-		    && instantiate(env, site, m2,
+		    && instantiate(names, env, site, m2,
 			    types.lowerBoundArgtypes(mt1), null, null, null,
 			    allowBoxing, true, noteWarner) != null)
 		    && !noteWarner.unchecked;
 	    Type mt2 = types.memberType(site, m2);
 	    noteWarner.unchecked = false;
-	    boolean m2SignatureMoreSpecific = (instantiate(env, site, m1,
-		    types.lowerBoundArgtypes(mt2), null, null, null,
+	    boolean m2SignatureMoreSpecific = (instantiate(names, env, site,
+		    m1, types.lowerBoundArgtypes(mt2), null, null, null,
 		    allowBoxing, false, noteWarner) != null || useVarargs
-		    && instantiate(env, site, m1,
+		    && instantiate(names, env, site, m1,
 			    types.lowerBoundArgtypes(mt2), null, null, null,
 			    allowBoxing, true, noteWarner) != null)
 		    && !noteWarner.unchecked;
@@ -1533,6 +1539,31 @@ public class Resolve {
 	Symbol sym = elt.getSymbol();
 	if (sym != null)
 	    return isInScope(sym, env);
+	return true;
+    }
+
+    // DPJIZER
+    public boolean isInScope(RegionParameterSymbol sym, Env<AttrContext> env) {
+	Symbol sym1 = findRegion(env, sym.name);
+	return (sym1 == sym);
+    }
+
+    // DPJIZER
+    public boolean dpjizerIsInScope(Symbol sym, Env<AttrContext> env) {
+	if (sym instanceof VarSymbol)
+	    return isInScope((VarSymbol) sym, env);
+	else if (sym instanceof RegionNameSymbol)
+	    return isInScope((RegionNameSymbol) sym, env);
+	else if (sym instanceof RegionParameterSymbol)
+	    return isInScope((RegionParameterSymbol) sym, env);
+	return true;
+    }
+
+    // DPJIZER
+    public boolean dpjizerIsInScope(RPLElement elt, Env<AttrContext> env) {
+	Symbol sym = elt.getSymbol();
+	if (sym != null)
+	    return dpjizerIsInScope(sym, env);
 	return true;
     }
 

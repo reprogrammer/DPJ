@@ -3,6 +3,9 @@
  */
 package com.sun.tools.javac.code.dpjizer.substitutions;
 
+import com.sun.tools.javac.comp.AttrContext;
+import com.sun.tools.javac.comp.Env;
+
 /**
  * 
  * @author Stephen Heumann
@@ -10,5 +13,7 @@ package com.sun.tools.javac.code.dpjizer.substitutions;
  * 
  */
 public interface RegionVariableElement {
+
+    Env<AttrContext> getEnv();
 
 }
