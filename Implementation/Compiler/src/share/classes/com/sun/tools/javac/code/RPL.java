@@ -838,8 +838,7 @@ public class RPL {
 		RPLElement.ArrayIndexRPLElement rhsRPLElement = new RPLElement.ArrayIndexRPLElement(
 			rhs);
 		// FIXME: We have to handle substitutions such as [idx <- j + 1]
-		if (rhsRPLElement.equals(rplElement)
-			|| indexSubstitution.isRHSAnyIndex()) {
+		if (rhsRPLElement.equals(rplElement)) {
 		    Constraint lhsInRest = rplWithoutLastSubstitutions
 			    .shouldContainRPLElement(new RPLElement.VarRPLElement(
 				    lhs));
