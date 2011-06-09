@@ -29,7 +29,7 @@ public class ConstraintsSet implements Constraints {
 
     @Override
     public boolean add(Constraint constraint) {
-	Logger.log("Adding the constraint " + constraint.toString());
+//	Logger.log("Adding the constraint " + constraint.toString());
 	return constraints.add(constraint);
     }
 

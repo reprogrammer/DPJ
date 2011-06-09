@@ -46,6 +46,16 @@ public class ConjunctiveConstraint extends CompositeConstraint {
     }
 
     @Override
+    public boolean isAlwaysTrue() {
+	return constraints.isEmpty();
+    }
+
+    @Override
+    public boolean isAlwaysFalse() {
+	return false;
+    }
+
+    @Override
     public String toString() {
 	if (constraints.isEmpty()) {
 	    return "TRUE";

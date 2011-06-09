@@ -791,7 +791,7 @@ public class RPL {
     }
 
     public Constraint shouldContainRPLElement(RPLElement rplElement) {
-	System.out.println(this + " should contain " + rplElement);
+	// System.out.println(this + " should contain " + rplElement);
 	Constraints result = new ConstraintsSet();
 	if (!hasSubstitutionChain()) {
 	    if (doesContainRPLElement(rplElement)) {

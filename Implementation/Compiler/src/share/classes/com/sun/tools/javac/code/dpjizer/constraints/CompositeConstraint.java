@@ -25,6 +25,10 @@ public abstract class CompositeConstraint implements Constraint {
 
     protected abstract Constraint simplified();
 
+    abstract public boolean isAlwaysTrue();
+    
+    abstract public boolean isAlwaysFalse();
+    
     @Override
     public int hashCode() {
 	final int prime = 31;

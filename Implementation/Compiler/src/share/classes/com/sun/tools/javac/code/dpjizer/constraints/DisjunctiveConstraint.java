@@ -46,6 +46,16 @@ public class DisjunctiveConstraint extends CompositeConstraint {
     }
 
     @Override
+    public boolean isAlwaysTrue() {
+	return false;
+    }
+
+    @Override
+    public boolean isAlwaysFalse() {
+	return constraints.isEmpty();
+    }
+    
+    @Override
     public String toString() {
 	if (constraints.isEmpty()) {
 	    return "FALSE";
