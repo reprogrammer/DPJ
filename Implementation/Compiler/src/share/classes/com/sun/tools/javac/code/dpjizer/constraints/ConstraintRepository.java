@@ -5,12 +5,14 @@ package com.sun.tools.javac.code.dpjizer.constraints;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.inject.Inject;
+import com.sun.tools.javac.code.RPL;
+import com.sun.tools.javac.code.RPLElement;
 import com.sun.tools.javac.code.dpjizer.dirs.Dirs;
 import com.sun.tools.javac.code.dpjizer.dirs.FileUtils;
 
@@ -27,6 +29,8 @@ public class ConstraintRepository {
 
     int counter = 1;
 
+    private Map<RPL, BeginWithConstraint> beginWithMap = new HashMap<RPL, BeginWithConstraint>();
+
     private static ConstraintRepository instance;
 
     public static ConstraintRepository getInstance() {
@@ -42,6 +46,23 @@ public class ConstraintRepository {
 
     public void add(Constraint constraint) {
 	constraints.add(constraint);
+
+	if (constraint instanceof BeginWithConstraint) {
+	    BeginWithConstraint beginWithConstraint = (BeginWithConstraint) constraint;
+	    beginWithMap.put(beginWithConstraint.getRPL(), beginWithConstraint);
+	}
+    }
+
+    public Collection<BeginWithConstraint> getBeginWithConstraints() {
+	return beginWithMap.values();
+    }
+
+    public boolean doesBeginWithAnything(RPL rpl) {
+	return beginWithMap.containsKey(rpl);
+    }
+
+    public RPLElement getBeginning(RPL rpl) {
+	return beginWithMap.get(rpl).getBeginning();
     }
 
     @Override
@@ -54,7 +75,8 @@ public class ConstraintRepository {
 	PrintWriter printWriter = null;
 	try {
 	    printWriter = new PrintWriter(dirs.getConstraintsFileName());
-	    List<Constraint> sortedConstraints = constraints.sortedConstraints();
+	    List<Constraint> sortedConstraints = constraints
+		    .sortedConstraints();
 	    for (Constraint constraint : sortedConstraints) {
 		printWriter.println(constraint);
 	    }

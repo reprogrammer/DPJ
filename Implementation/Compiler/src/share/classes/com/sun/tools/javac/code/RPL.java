@@ -16,7 +16,7 @@ import com.sun.tools.javac.code.dpjizer.constraints.Constraints;
 import com.sun.tools.javac.code.dpjizer.constraints.ConstraintsSet;
 import com.sun.tools.javac.code.dpjizer.constraints.DisjunctiveConstraint;
 import com.sun.tools.javac.code.dpjizer.constraints.InclusionConstraint;
-import com.sun.tools.javac.code.dpjizer.constraints.RPLElementEqualityConstraint;
+import com.sun.tools.javac.code.dpjizer.constraints.RPLElementContainmentConstraint;
 import com.sun.tools.javac.code.dpjizer.constraints.RegionVarElt;
 import com.sun.tools.javac.code.dpjizer.substitutions.IndexSubstitution;
 import com.sun.tools.javac.code.dpjizer.substitutions.RegionSubstitution;
@@ -800,7 +800,7 @@ public class RPL {
 		for (RPLElement e : elts) {
 		    if (e instanceof RegionVariableElement) {
 			RegionVariableElement regionVarElt = (RegionVariableElement) e;
-			result.add(RPLElementEqualityConstraint
+			result.add(RPLElementContainmentConstraint
 				.newRPLElementEqualityConstraint(regionVarElt,
 					rplElement));
 		    }

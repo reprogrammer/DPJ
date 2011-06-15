@@ -11,7 +11,8 @@ import java.util.Iterator;
  * @author Mohsen Vakilian
  * 
  */
-public abstract class CompositeConstraint implements Constraint {
+public abstract class CompositeConstraint implements Constraint,
+	Iterable<Constraint> {
 
     protected Constraints constraints;
 
@@ -26,9 +27,14 @@ public abstract class CompositeConstraint implements Constraint {
     protected abstract Constraint simplified();
 
     abstract public boolean isAlwaysTrue();
-    
+
     abstract public boolean isAlwaysFalse();
-    
+
+    @Override
+    public Iterator<Constraint> iterator() {
+	return constraints.iterator();
+    }
+
     @Override
     public int hashCode() {
 	final int prime = 31;

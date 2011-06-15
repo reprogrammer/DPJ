@@ -19,14 +19,14 @@ import com.sun.tools.javac.util.Context;
  * @author Mohsen Vakilian
  * 
  */
-public class RPLElementEqualityConstraint implements Constraint {
+public class RPLElementContainmentConstraint implements Constraint {
 
     RegionVariableElement regionVariableElement;
     RPLElement rplElement;
 
     public static Context context;
 
-    private RPLElementEqualityConstraint(
+    private RPLElementContainmentConstraint(
 	    RegionVariableElement regionVariableElement, RPLElement rplElement) {
 	this.regionVariableElement = regionVariableElement;
 	this.rplElement = rplElement;
@@ -35,7 +35,7 @@ public class RPLElementEqualityConstraint implements Constraint {
     public static Constraint newRPLElementEqualityConstraint(
 	    RegionVariableElement regionVariableElement, RPLElement rplElement) {
 	if (canBeEqual(regionVariableElement, rplElement)) {
-	    return new RPLElementEqualityConstraint(regionVariableElement,
+	    return new RPLElementContainmentConstraint(regionVariableElement,
 		    rplElement);
 	} else {
 	    return CompositeConstraint.ALWAYS_FALSE;
@@ -57,7 +57,7 @@ public class RPLElementEqualityConstraint implements Constraint {
 
     @Override
     public String toString() {
-	return regionVariableElement + " = " + rplElement;
+	return regionVariableElement + " contains " + rplElement;
     }
 
     @Override
@@ -73,7 +73,7 @@ public class RPLElementEqualityConstraint implements Constraint {
 	    return false;
 	if (getClass() != obj.getClass())
 	    return false;
-	RPLElementEqualityConstraint other = (RPLElementEqualityConstraint) obj;
+	RPLElementContainmentConstraint other = (RPLElementContainmentConstraint) obj;
 	if (regionVariableElement == null) {
 	    if (other.regionVariableElement != null)
 		return false;
