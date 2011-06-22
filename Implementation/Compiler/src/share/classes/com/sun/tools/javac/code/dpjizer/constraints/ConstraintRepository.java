@@ -13,8 +13,13 @@ import java.util.Map;
 import com.google.inject.Inject;
 import com.sun.tools.javac.code.RPL;
 import com.sun.tools.javac.code.RPLElement;
+import com.sun.tools.javac.code.RPLElement.NameRPLElement;
+import com.sun.tools.javac.code.dpjizer.FreshRPLElementFactory;
 import com.sun.tools.javac.code.dpjizer.dirs.Dirs;
 import com.sun.tools.javac.code.dpjizer.dirs.FileUtils;
+import com.sun.tools.javac.comp.AttrContext;
+import com.sun.tools.javac.comp.Env;
+import com.sun.tools.javac.util.Name;
 
 /**
  * 
@@ -26,6 +31,10 @@ public class ConstraintRepository {
     Constraints constraints;
 
     Dirs dirs;
+
+    private Env<AttrContext> freshNameRPLElementEnv;
+
+    private Name.Table names;
 
     int counter = 1;
 
@@ -44,12 +53,35 @@ public class ConstraintRepository {
 	instance = this;
     }
 
-    public void add(Constraint constraint) {
-	constraints.add(constraint);
+    public void setFreshNameRPLElementEnvIfIsUnknown(Env<AttrContext> env) {
+	if (freshNameRPLElementEnv == null) {
+	    freshNameRPLElementEnv = env;
+	}
+    }
 
-	if (constraint instanceof BeginWithConstraint) {
-	    BeginWithConstraint beginWithConstraint = (BeginWithConstraint) constraint;
-	    beginWithMap.put(beginWithConstraint.getRPL(), beginWithConstraint);
+    public void setNames(Name.Table names) {
+	if (this.names == null) {
+	    this.names = names;
+	}
+    }
+
+    public void add(Constraint constraint) {
+	if (constraint instanceof InclusionConstraint) {
+	    InclusionConstraint inclusionConstraint = (InclusionConstraint) constraint;
+	    RPL contained = inclusionConstraint.getContained();
+	    RPL container = inclusionConstraint.getContainer();
+	    NameRPLElement freshNameRPLElement = FreshRPLElementFactory
+		    .getFreshNameRPLElement(names, freshNameRPLElementEnv);
+	    add(contained.shouldContainRPLElement(freshNameRPLElement));
+	    add(container.shouldContainRPLElement(freshNameRPLElement));
+	} else {
+	    constraints.add(constraint);
+
+	    if (constraint instanceof BeginWithConstraint) {
+		BeginWithConstraint beginWithConstraint = (BeginWithConstraint) constraint;
+		beginWithMap.put(beginWithConstraint.getRPL(),
+			beginWithConstraint);
+	    }
 	}
     }
 

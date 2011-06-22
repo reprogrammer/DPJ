@@ -12,12 +12,20 @@ import com.sun.tools.javac.code.RPL;
  */
 public class InclusionConstraint implements Constraint {
 
-    RPL contained;
-    RPL container;
+    private final RPL contained;
+    private final RPL container;
 
     public InclusionConstraint(RPL contained, RPL container) {
 	this.contained = contained;
 	this.container = container;
+    }
+
+    public RPL getContained() {
+	return contained;
+    }
+
+    public RPL getContainer() {
+	return container;
     }
 
     @Override
