@@ -8,6 +8,7 @@ import com.sun.tools.javac.code.Symbol.RegionParameterSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type.ClassType;
 import com.sun.tools.javac.code.Type.TypeVar;
+import com.sun.tools.javac.code.dpjizer.constraints.BeginWithConstraint;
 import com.sun.tools.javac.code.dpjizer.constraints.CompositeConstraint;
 import com.sun.tools.javac.code.dpjizer.constraints.ConjunctiveConstraint;
 import com.sun.tools.javac.code.dpjizer.constraints.Constraint;
@@ -20,7 +21,6 @@ import com.sun.tools.javac.code.dpjizer.constraints.RPLElementContainmentConstra
 import com.sun.tools.javac.code.dpjizer.constraints.RegionVarElt;
 import com.sun.tools.javac.code.dpjizer.substitutions.IndexSubstitution;
 import com.sun.tools.javac.code.dpjizer.substitutions.RegionSubstitution;
-import com.sun.tools.javac.code.dpjizer.substitutions.RegionVariableElement;
 import com.sun.tools.javac.code.dpjizer.substitutions.Substitution;
 import com.sun.tools.javac.code.dpjizer.substitutions.SubstitutionChain;
 import com.sun.tools.javac.code.dpjizer.substitutions.Substitutions;
@@ -790,7 +790,22 @@ public class RPL {
 	return false;
     }
 
+    enum ConstraintKind {
+	CONTAINS, BEGINS_WITH
+    };
+
     public Constraint shouldContainRPLElement(RPLElement rplElement) {
+	return shouldContainOrBeginWithRPLElement(rplElement,
+		ConstraintKind.CONTAINS);
+    }
+
+    public Constraint shouldBeginWithRPLElement(RPLElement rplElement) {
+	return shouldContainOrBeginWithRPLElement(rplElement,
+		ConstraintKind.BEGINS_WITH);
+    }
+
+    private Constraint shouldContainOrBeginWithRPLElement(
+	    RPLElement rplElement, ConstraintKind constraintKind) {
 	// System.out.println(this + " should contain " + rplElement);
 	Constraints result = new ConstraintsSet();
 	if (!hasSubstitutionChain()) {
@@ -798,11 +813,22 @@ public class RPL {
 		return CompositeConstraint.ALWAYS_TRUE;
 	    } else {
 		for (RPLElement e : elts) {
-		    if (e instanceof RegionVariableElement) {
-			RegionVariableElement regionVarElt = (RegionVariableElement) e;
-			result.add(RPLElementContainmentConstraint
-				.newRPLElementEqualityConstraint(regionVarElt,
-					rplElement));
+		    if (e instanceof RegionVarElt) {
+			RegionVarElt regionVarElt = (RegionVarElt) e;
+
+			Constraint constraint = null;
+			if (constraintKind == ConstraintKind.CONTAINS) {
+			    constraint = RPLElementContainmentConstraint
+				    .newRPLElementContainmentConstraint(
+					    regionVarElt, rplElement);
+			} else if (constraintKind == ConstraintKind.BEGINS_WITH) {
+			    constraint = new BeginWithConstraint(new RPL(
+				    regionVarElt), rplElement);
+			} else {
+			    throw new AssertionError(
+				    "Unexpected constraint kind was provided.");
+			}
+			result.add(constraint);
 		    }
 		}
 
@@ -812,7 +838,7 @@ public class RPL {
 
 	RPL rplWithoutLastSubstitutions = withoutLastSubstitutions();
 	result.add(rplWithoutLastSubstitutions
-		.shouldContainRPLElement(rplElement));
+		.shouldContainOrBeginWithRPLElement(rplElement, constraintKind));
 
 	Substitutions lastSubstitutions = substitutionChain
 		.getLastSubstitutions();
@@ -822,10 +848,12 @@ public class RPL {
 		RegionParameterSymbol lhs = regionSubstitution.getLHS();
 		RPL rhs = regionSubstitution.getRHS();
 		Constraint rplElementInRHS = rhs
-			.shouldContainRPLElement(rplElement);
+			.shouldContainOrBeginWithRPLElement(rplElement,
+				constraintKind);
 		Constraint lhsInRest = rplWithoutLastSubstitutions
-			.shouldContainRPLElement(new RPLElement.RPLParameterElement(
-				lhs));
+			.shouldContainOrBeginWithRPLElement(
+				new RPLElement.RPLParameterElement(lhs),
+				constraintKind);
 		Constraints constraints = new ConstraintsSet();
 		constraints.add(rplElementInRHS);
 		constraints.add(lhsInRest);
@@ -840,8 +868,9 @@ public class RPL {
 		// FIXME: We have to handle substitutions such as [idx <- j + 1]
 		if (rhsRPLElement.equals(rplElement)) {
 		    Constraint lhsInRest = rplWithoutLastSubstitutions
-			    .shouldContainRPLElement(new RPLElement.VarRPLElement(
-				    lhs));
+			    .shouldContainOrBeginWithRPLElement(
+				    new RPLElement.VarRPLElement(lhs),
+				    constraintKind);
 		    result.add(lhsInRest);
 		}
 	    }

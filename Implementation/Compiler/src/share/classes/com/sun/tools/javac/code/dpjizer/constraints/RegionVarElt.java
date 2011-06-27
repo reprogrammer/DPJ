@@ -7,7 +7,6 @@ import static com.sun.tools.javac.code.Flags.STATIC;
 
 import com.sun.tools.javac.code.RPLElement;
 import com.sun.tools.javac.code.Scope;
-import com.sun.tools.javac.code.dpjizer.substitutions.RegionVariableElement;
 import com.sun.tools.javac.comp.AttrContext;
 import com.sun.tools.javac.comp.Env;
 import com.sun.tools.javac.util.Name;
@@ -19,7 +18,7 @@ import com.sun.tools.javac.util.Name.Table;
  * @author Mohsen Vakilian
  * 
  */
-public class RegionVarElt extends RPLElement implements RegionVariableElement {
+public class RegionVarElt extends RPLElement {
 
     public RegionVarEltSymbol sym;
 
@@ -69,7 +68,6 @@ public class RegionVarElt extends RPLElement implements RegionVariableElement {
 	return regionVarElt;
     }
 
-    @Override
     public Env<AttrContext> getEnv() {
 	return sym.env;
     }
