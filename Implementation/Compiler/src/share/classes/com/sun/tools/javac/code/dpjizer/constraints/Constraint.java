@@ -9,5 +9,9 @@ package com.sun.tools.javac.code.dpjizer.constraints;
  * 
  */
 public interface Constraint {
-    
+
+    int hashCode();
+
+    boolean equals(Object obj);
+
 }

@@ -12,8 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import edu.illinois.dpjizer.utils.Logger;
-
 /**
  * 
  * @author Mohsen Vakilian
@@ -29,7 +27,7 @@ public class ConstraintsSet implements Constraints {
 
     @Override
     public boolean add(Constraint constraint) {
-//	Logger.log("Adding the constraint " + constraint.toString());
+	// Logger.log("Adding the constraint " + constraint.toString());
 	return constraints.add(constraint);
     }
 
@@ -68,13 +66,17 @@ public class ConstraintsSet implements Constraints {
     }
 
     @Override
-    public boolean remove(Object arg0) {
-	throw new UnsupportedOperationException();
+    public boolean remove(Object constraint) {
+	return constraints.remove(constraint);
     }
 
     @Override
-    public boolean removeAll(Collection<?> arg0) {
-	throw new UnsupportedOperationException();
+    public boolean removeAll(Collection<?> constraints) {
+	boolean removedAnything = false;
+	for (Object constraint : constraints) {
+	    removedAnything |= this.constraints.remove(constraint);
+	}
+	return removedAnything;
     }
 
     @Override

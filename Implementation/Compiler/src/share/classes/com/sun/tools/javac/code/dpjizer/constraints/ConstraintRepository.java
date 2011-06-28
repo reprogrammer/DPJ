@@ -21,6 +21,8 @@ import com.sun.tools.javac.comp.AttrContext;
 import com.sun.tools.javac.comp.Env;
 import com.sun.tools.javac.util.Name;
 
+import edu.illinois.dpjizer.utils.Logger;
+
 /**
  * 
  * @author Mohsen Vakilian
@@ -29,6 +31,8 @@ import com.sun.tools.javac.util.Name;
 public class ConstraintRepository {
 
     Constraints constraints;
+
+    Constraints replacedConstraints = new ConstraintsSet();
 
     Dirs dirs;
 
@@ -72,8 +76,16 @@ public class ConstraintRepository {
 	    RPL container = inclusionConstraint.getContainer();
 	    NameRPLElement freshNameRPLElement = FreshRPLElementFactory
 		    .getFreshNameRPLElement(names, freshNameRPLElementEnv);
-	    add(contained.shouldContainRPLElement(freshNameRPLElement));
-	    add(container.shouldContainRPLElement(freshNameRPLElement));
+	    Constraint constraintOnContained = contained
+		    .shouldContainRPLElement(freshNameRPLElement);
+	    Logger.log("Adding the following constraint because of an inclusion constraint:\n"
+		    + constraintOnContained);
+	    add(constraintOnContained);
+	    Constraint constraintOnContainer = container
+		    .shouldContainRPLElement(freshNameRPLElement);
+	    Logger.log("Adding the following constraint because of an inclusion constraint:\n"
+		    + constraintOnContainer);
+	    add(constraintOnContainer);
 	} else {
 	    constraints.add(constraint);
 
@@ -95,6 +107,11 @@ public class ConstraintRepository {
 
     public RPLElement getBeginning(RPL rpl) {
 	return beginWithMap.get(rpl).getBeginning();
+    }
+
+    public void markAsReplacedConstraint(Constraint constraint) {
+	constraints.remove(constraint);
+	replacedConstraints.add(constraint);
     }
 
     @Override
@@ -121,7 +138,7 @@ public class ConstraintRepository {
     }
 
     public void solve() {
-	
+
     }
 
 }
