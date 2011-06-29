@@ -54,7 +54,18 @@ public class DisjunctiveConstraint extends CompositeConstraint {
     public boolean isAlwaysFalse() {
 	return constraints.isEmpty();
     }
-    
+
+    public SolverState solve(SolverState solverState) {
+	for (Constraint constraint : constraints) {
+	    SolverState solverStateClone = solverState.clone();
+	    constraint.solve(solverStateClone);
+	    if (solverStateClone.isConsistent()) {
+		return solverStateClone;
+	    }
+	}
+	return SolverState.INCONSISTENT_STATE;
+    }
+
     @Override
     public String toString() {
 	if (constraints.isEmpty()) {

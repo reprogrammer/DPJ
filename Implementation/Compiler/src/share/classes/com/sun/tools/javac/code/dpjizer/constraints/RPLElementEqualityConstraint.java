@@ -11,12 +11,12 @@ import com.sun.tools.javac.code.RPLElement;
  * @author Mohsen Vakilian
  * 
  */
-public class RPLElementDistinctnessConstraint implements Constraint {
+public class RPLElementEqualityConstraint implements Constraint {
 
     private RPLElement firstRPLElement;
     private RPLElement secondRPLElement;
 
-    public RPLElementDistinctnessConstraint(RPLElement firstRPLElement,
+    public RPLElementEqualityConstraint(RPLElement firstRPLElement,
 	    RPLElement secondRPLElement) {
 	this.firstRPLElement = firstRPLElement;
 	this.secondRPLElement = secondRPLElement;
@@ -38,7 +38,7 @@ public class RPLElementDistinctnessConstraint implements Constraint {
 
     @Override
     public String toString() {
-	return firstRPLElement + " should be distinct from " + secondRPLElement;
+	return firstRPLElement + " should be equal to " + secondRPLElement;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class RPLElementDistinctnessConstraint implements Constraint {
 	    return false;
 	if (getClass() != obj.getClass())
 	    return false;
-	RPLElementDistinctnessConstraint other = (RPLElementDistinctnessConstraint) obj;
+	RPLElementEqualityConstraint other = (RPLElementEqualityConstraint) obj;
 	if (firstRPLElement == null) {
 	    if (other.firstRPLElement != null)
 		return false;

@@ -14,4 +14,6 @@ public interface Constraint {
 
     boolean equals(Object obj);
 
+    public SolverState solve(SolverState solverState);
+
 }

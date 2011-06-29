@@ -22,11 +22,17 @@ public class DisjointnessConstraint implements Constraint {
     }
 
     public RPL getFirstRPL() {
-        return firstRPL;
+	return firstRPL;
     }
 
     public RPL getSecondRPL() {
-        return secondRPL;
+	return secondRPL;
+    }
+
+    @Override
+    public SolverState solve(SolverState solverState) {
+	throw new UnsupportedOperationException();
+
     }
 
     @Override
@@ -38,8 +44,10 @@ public class DisjointnessConstraint implements Constraint {
     public int hashCode() {
 	final int prime = 31;
 	int result = 1;
-	result = prime * result + ((firstRPL == null) ? 0 : firstRPL.hashCode());
-	result = prime * result + ((secondRPL == null) ? 0 : secondRPL.hashCode());
+	result = prime * result
+		+ ((firstRPL == null) ? 0 : firstRPL.hashCode());
+	result = prime * result
+		+ ((secondRPL == null) ? 0 : secondRPL.hashCode());
 	return result;
     }
 

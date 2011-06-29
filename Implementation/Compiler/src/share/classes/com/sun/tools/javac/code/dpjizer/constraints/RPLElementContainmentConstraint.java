@@ -50,6 +50,12 @@ public class RPLElementContainmentConstraint implements Constraint {
     }
 
     @Override
+    public SolverState solve(SolverState solverState) {
+	solverState.add(this);
+	return solverState;
+    }
+
+    @Override
     public String toString() {
 	return regionVarElt + " contains " + rplElement;
     }

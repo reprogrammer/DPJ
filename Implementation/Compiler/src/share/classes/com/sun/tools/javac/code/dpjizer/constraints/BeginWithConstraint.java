@@ -31,6 +31,12 @@ public class BeginWithConstraint implements Constraint {
     }
 
     @Override
+    public SolverState solve(SolverState solverState) {
+	solverState.add(this);
+	return solverState;
+    }
+
+    @Override
     public String toString() {
 	return rpl + " begins with " + beginning;
     }

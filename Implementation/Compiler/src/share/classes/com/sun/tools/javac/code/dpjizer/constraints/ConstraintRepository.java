@@ -138,7 +138,10 @@ public class ConstraintRepository {
     }
 
     public void solve() {
-
+	Constraint allConstraints = ConjunctiveConstraint
+		.newConjunctiveConstraint(constraints);
+	SolverState solverState = new SolverState();
+	solverState = allConstraints.solve(solverState);
+	Logger.log("The final solver state is:\n" + solverState);
     }
-
 }

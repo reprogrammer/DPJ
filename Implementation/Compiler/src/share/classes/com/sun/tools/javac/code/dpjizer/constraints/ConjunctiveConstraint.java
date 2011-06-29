@@ -55,6 +55,16 @@ public class ConjunctiveConstraint extends CompositeConstraint {
 	return false;
     }
 
+    public SolverState solve(SolverState solverState) {
+	for (Constraint constraint : constraints) {
+	    solverState = constraint.solve(solverState);
+	    if (!solverState.isConsistent()) {
+		return SolverState.INCONSISTENT_STATE;
+	    }
+	}
+	return solverState;
+    }
+
     @Override
     public String toString() {
 	if (constraints.isEmpty()) {

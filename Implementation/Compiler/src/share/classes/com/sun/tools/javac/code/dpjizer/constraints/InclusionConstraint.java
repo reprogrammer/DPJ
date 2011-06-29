@@ -29,6 +29,12 @@ public class InclusionConstraint implements Constraint {
     }
 
     @Override
+    public SolverState solve(SolverState solverState) {
+	throw new UnsupportedOperationException();
+
+    }
+
+    @Override
     public String toString() {
 	return contained + " is in " + container;
     }
