@@ -4,7 +4,6 @@
 package com.sun.tools.javac.code.dpjizer.constraints;
 
 import com.sun.tools.javac.code.RPL;
-import com.sun.tools.javac.code.RPLElement;
 
 /**
  * 
@@ -15,9 +14,9 @@ import com.sun.tools.javac.code.RPLElement;
 public class BeginWithConstraint implements Constraint {
 
     private RPL rpl;
-    private RPLElement beginning;
+    private RPL beginning;
 
-    public BeginWithConstraint(RPL first, RPLElement beginning) {
+    public BeginWithConstraint(RPL first, RPL beginning) {
 	this.rpl = first;
 	this.beginning = beginning;
     }
@@ -26,7 +25,7 @@ public class BeginWithConstraint implements Constraint {
 	return rpl;
     }
 
-    public RPLElement getBeginning() {
+    public RPL getBeginning() {
 	return beginning;
     }
 

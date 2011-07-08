@@ -3,6 +3,7 @@
  */
 package com.sun.tools.javac.code.dpjizer.constraints;
 
+import com.sun.tools.javac.code.RPL;
 import com.sun.tools.javac.code.RPLElement;
 import com.sun.tools.javac.comp.Resolve;
 import com.sun.tools.javac.util.Context;
@@ -16,37 +17,43 @@ import com.sun.tools.javac.util.Context;
 public class RPLElementContainmentConstraint implements Constraint {
 
     RegionVarElt regionVarElt;
-    RPLElement rplElement;
+    RPL rpl;
 
     public static Context context;
 
     private RPLElementContainmentConstraint(RegionVarElt regionVariableElement,
-	    RPLElement rplElement) {
+	    RPL rpl) {
 	this.regionVarElt = regionVariableElement;
-	this.rplElement = rplElement;
+	this.rpl = rpl;
     }
 
     public static Constraint newRPLElementContainmentConstraint(
-	    RegionVarElt regionVariableElement, RPLElement rplElement) {
-	if (canBeEqual(regionVariableElement, rplElement)) {
+	    RegionVarElt regionVariableElement, RPL rpl) {
+	if (canBeEqual(regionVariableElement, rpl)) {
 	    return new RPLElementContainmentConstraint(regionVariableElement,
-		    rplElement);
+		    rpl);
 	} else {
 	    return CompositeConstraint.ALWAYS_FALSE;
 	}
     }
 
     private static boolean canBeEqual(RegionVarElt regionVariableElement,
-	    RPLElement rplElement) {
+	    RPL rpl) {
 
 	if (context == null) {
 	    throw new AssertionError("Expected a valid context.");
 	}
 
-	Resolve resolve = Resolve.instance(context);
-	boolean isRPLElementInScopeOfRegionVariable = resolve.dpjizerIsInScope(
-		rplElement, regionVariableElement.getEnv());
-	return isRPLElementInScopeOfRegionVariable;
+	for (RPLElement rplElement : rpl.elts) {
+	    Resolve resolve = Resolve.instance(context);
+	    boolean isRPLElementInScopeOfRegionVariable = resolve
+		    .dpjizerIsInScope(rplElement,
+			    regionVariableElement.getEnv());
+	    if (!isRPLElementInScopeOfRegionVariable) {
+		return false;
+	    }
+	}
+	return true;
     }
 
     @Override
@@ -57,7 +64,7 @@ public class RPLElementContainmentConstraint implements Constraint {
 
     @Override
     public String toString() {
-	return regionVarElt + " contains " + rplElement;
+	return regionVarElt + " contains " + rpl;
     }
 
     @Override
@@ -79,10 +86,10 @@ public class RPLElementContainmentConstraint implements Constraint {
 		return false;
 	} else if (!regionVarElt.equals(other.regionVarElt))
 	    return false;
-	if (rplElement == null) {
-	    if (other.rplElement != null)
+	if (rpl == null) {
+	    if (other.rpl != null)
 		return false;
-	} else if (!rplElement.equals(other.rplElement))
+	} else if (!rpl.equals(other.rpl))
 	    return false;
 	return true;
     }

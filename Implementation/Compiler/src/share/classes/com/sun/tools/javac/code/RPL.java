@@ -794,22 +794,22 @@ public class RPL {
 	CONTAINS, BEGINS_WITH
     };
 
-    public Constraint shouldContainRPLElement(RPLElement rplElement) {
-	return shouldContainOrBeginWithRPLElement(rplElement,
-		ConstraintKind.CONTAINS);
+    public Constraint shouldContainRPLElement(RPL rpl) {
+	return shouldContainOrBeginWithRPLElement(rpl, ConstraintKind.CONTAINS);
     }
 
-    public Constraint shouldBeginWithRPLElement(RPLElement rplElement) {
-	return shouldContainOrBeginWithRPLElement(rplElement,
+    public Constraint shouldBeginWithRPLElement(RPL rpl) {
+	return shouldContainOrBeginWithRPLElement(rpl,
 		ConstraintKind.BEGINS_WITH);
     }
 
-    private Constraint shouldContainOrBeginWithRPLElement(
-	    RPLElement rplElement, ConstraintKind constraintKind) {
-	// System.out.println(this + " should contain " + rplElement);
+    private Constraint shouldContainOrBeginWithRPLElement(RPL rpl,
+	    ConstraintKind constraintKind) {
+	// System.err.println(this + " should contain " + rpl);
 	Constraints result = new ConstraintsSet();
 	if (!hasSubstitutionChain()) {
-	    if (doesContainRPLElement(rplElement)) {
+	    // FIXME: The base case should check for containment better.
+	    if (doesContainRPLElement(rpl.elts.head)) {
 		return CompositeConstraint.ALWAYS_TRUE;
 	    } else {
 		for (RPLElement e : elts) {
@@ -820,10 +820,10 @@ public class RPL {
 			if (constraintKind == ConstraintKind.CONTAINS) {
 			    constraint = RPLElementContainmentConstraint
 				    .newRPLElementContainmentConstraint(
-					    regionVarElt, rplElement);
+					    regionVarElt, rpl);
 			} else if (constraintKind == ConstraintKind.BEGINS_WITH) {
 			    constraint = new BeginWithConstraint(new RPL(
-				    regionVarElt), rplElement);
+				    regionVarElt), rpl);
 			} else {
 			    throw new AssertionError(
 				    "Unexpected constraint kind was provided.");
@@ -838,7 +838,7 @@ public class RPL {
 
 	RPL rplWithoutLastSubstitutions = withoutLastSubstitutions();
 	result.add(rplWithoutLastSubstitutions
-		.shouldContainOrBeginWithRPLElement(rplElement, constraintKind));
+		.shouldContainOrBeginWithRPLElement(rpl, constraintKind));
 
 	Substitutions lastSubstitutions = substitutionChain
 		.getLastSubstitutions();
@@ -848,11 +848,10 @@ public class RPL {
 		RegionParameterSymbol lhs = regionSubstitution.getLHS();
 		RPL rhs = regionSubstitution.getRHS();
 		Constraint rplElementInRHS = rhs
-			.shouldContainOrBeginWithRPLElement(rplElement,
-				constraintKind);
+			.shouldContainOrBeginWithRPLElement(rpl, constraintKind);
 		Constraint lhsInRest = rplWithoutLastSubstitutions
-			.shouldContainOrBeginWithRPLElement(
-				new RPLElement.RPLParameterElement(lhs),
+			.shouldContainOrBeginWithRPLElement(new RPL(
+				new RPLElement.RPLParameterElement(lhs)),
 				constraintKind);
 		Constraints constraints = new ConstraintsSet();
 		constraints.add(rplElementInRHS);
@@ -865,11 +864,12 @@ public class RPL {
 		JCExpression rhs = indexSubstitution.getRHS();
 		RPLElement.ArrayIndexRPLElement rhsRPLElement = new RPLElement.ArrayIndexRPLElement(
 			rhs);
+		RPL rhsRPL = new RPL(rhsRPLElement);
 		// FIXME: We have to handle substitutions such as [idx <- j + 1]
-		if (rhsRPLElement.equals(rplElement)) {
+		if (rhsRPL.equals(rpl)) {
 		    Constraint lhsInRest = rplWithoutLastSubstitutions
-			    .shouldContainOrBeginWithRPLElement(
-				    new RPLElement.VarRPLElement(lhs),
+			    .shouldContainOrBeginWithRPLElement(new RPL(
+				    new RPLElement.VarRPLElement(lhs)),
 				    constraintKind);
 		    result.add(lhsInRest);
 		}

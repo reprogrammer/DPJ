@@ -36,7 +36,7 @@ public class ConstraintRepository {
 
     Dirs dirs;
 
-    private Env<AttrContext> freshNameRPLElementEnv;
+    private Env<AttrContext> env;
 
     private Name.Table names;
 
@@ -58,8 +58,8 @@ public class ConstraintRepository {
     }
 
     public void setFreshNameRPLElementEnvIfIsUnknown(Env<AttrContext> env) {
-	if (freshNameRPLElementEnv == null) {
-	    freshNameRPLElementEnv = env;
+	if (this.env == null) {
+	    this.env = env;
 	}
     }
 
@@ -74,15 +74,18 @@ public class ConstraintRepository {
 	    InclusionConstraint inclusionConstraint = (InclusionConstraint) constraint;
 	    RPL contained = inclusionConstraint.getContained();
 	    RPL container = inclusionConstraint.getContainer();
-	    NameRPLElement freshNameRPLElement = FreshRPLElementFactory
-		    .getFreshNameRPLElement(names, freshNameRPLElementEnv);
+	    // NameRPLElement freshNameRPLElement =
+	    // FreshRPLElementFactory.getFreshNameRPLElement(names,
+	    // freshNameRPLElementEnv);
+	    RPL variableRPL = new RPL(RegionVarElt.getFreshRegionVarElt(names,
+		    env));
 	    Constraint constraintOnContained = contained
-		    .shouldContainRPLElement(freshNameRPLElement);
+		    .shouldBeginWithRPLElement(variableRPL);
 	    Logger.log("Adding the following constraint because of an inclusion constraint:\n"
 		    + constraintOnContained);
 	    add(constraintOnContained);
 	    Constraint constraintOnContainer = container
-		    .shouldContainRPLElement(freshNameRPLElement);
+		    .shouldBeginWithRPLElement(variableRPL);
 	    Logger.log("Adding the following constraint because of an inclusion constraint:\n"
 		    + constraintOnContainer);
 	    add(constraintOnContainer);
@@ -105,7 +108,7 @@ public class ConstraintRepository {
 	return beginWithMap.containsKey(rpl);
     }
 
-    public RPLElement getBeginning(RPL rpl) {
+    public RPL getBeginning(RPL rpl) {
 	return beginWithMap.get(rpl).getBeginning();
     }
 

@@ -56,10 +56,16 @@ public class SolverState {
 	BeginWithConstraint existingBeginWithConstraint = beginWithConstraints
 		.get(constraint.getRPL());
 	if (beginWithConstraints.containsKey(constraint.getRPL())) {
-	    if (!existingBeginWithConstraint.equals(constraint.getBeginning())) {
+	    if (!existingBeginWithConstraint.getBeginning().equals(
+		    constraint.getBeginning())) {
+		// FIXME: Because the begin-with constraints may force the the
+		// RPL begin with two RPLs of different lengths, we cannot
+		// simply assume that the two RPLs are the same. Rather, one of
+		// them just needs to begin with the other. For the time being,
+		// we are making the two RPLs consist of the RPL element.
 		RPLElementEqualityConstraint equalityConstraint = new RPLElementEqualityConstraint(
-			existingBeginWithConstraint.getBeginning(),
-			constraint.getBeginning());
+			existingBeginWithConstraint.getBeginning().elts.head,
+			constraint.getBeginning().elts.head);
 		add(equalityConstraint);
 	    }
 	} else {
@@ -68,9 +74,9 @@ public class SolverState {
     }
 
     public void add(RPLElementContainmentConstraint constraint) {
-	if (constraint.rplElement instanceof RPLElement.RPLParameterElement) {
+	if (constraint.rpl.elts.head instanceof RPLElement.RPLParameterElement) {
 	    add(new BeginWithConstraint(new RPL(constraint.regionVarElt),
-		    constraint.rplElement));
+		    constraint.rpl));
 	} else {
 	    containmentConstraints.put(constraint.regionVarElt, constraint);
 	}

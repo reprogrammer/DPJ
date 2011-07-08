@@ -31,7 +31,6 @@ public class InclusionConstraint implements Constraint {
     @Override
     public SolverState solve(SolverState solverState) {
 	throw new UnsupportedOperationException();
-
     }
 
     @Override
