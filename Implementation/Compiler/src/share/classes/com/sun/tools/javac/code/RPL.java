@@ -773,11 +773,15 @@ public class RPL {
     }
 
     // DPJIZER
+    public Substitutions getLastSubstitutions() {
+	return substitutionChain.getLastSubstitutions();
+    }
+
     public RPL withoutLastSubstitutions() {
 	return new RPL(elts, substitutionChain.withoutLastSubstitutions());
     }
 
-    private boolean hasSubstitutionChain() {
+    public boolean hasSubstitutionChain() {
 	return !substitutionChain.isEmpty();
     }
 

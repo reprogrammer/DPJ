@@ -11,14 +11,14 @@ import com.sun.tools.javac.code.RPL;
  * @author Mohsen Vakilian
  * 
  */
-public class DisjointnessConstraint implements Constraint {
+public class RPLEqualityConstraint implements Constraint {
 
-    RPL firstRPL;
-    RPL secondRPL;
+    private RPL firstRPL;
+    private RPL secondRPL;
 
-    public DisjointnessConstraint(RPL first, RPL second) {
-	this.firstRPL = first;
-	this.secondRPL = second;
+    public RPLEqualityConstraint(RPL firstRPL, RPL secondRPL) {
+	this.firstRPL = firstRPL;
+	this.secondRPL = secondRPL;
     }
 
     public RPL getFirstRPL() {
@@ -32,23 +32,16 @@ public class DisjointnessConstraint implements Constraint {
     @Override
     public SolverState solve(SolverState solverState) {
 	throw new UnsupportedOperationException();
-
     }
 
     @Override
     public String toString() {
-	return firstRPL + " should be disjoint from " + secondRPL;
+	return firstRPL + " should be equal to " + secondRPL;
     }
 
     @Override
     public int hashCode() {
-	final int prime = 31;
-	int result = 1;
-	result = prime * result
-		+ ((firstRPL == null) ? 0 : firstRPL.hashCode());
-	result = prime * result
-		+ ((secondRPL == null) ? 0 : secondRPL.hashCode());
-	return result;
+	return 97;
     }
 
     @Override
@@ -59,7 +52,7 @@ public class DisjointnessConstraint implements Constraint {
 	    return false;
 	if (getClass() != obj.getClass())
 	    return false;
-	DisjointnessConstraint other = (DisjointnessConstraint) obj;
+	RPLEqualityConstraint other = (RPLEqualityConstraint) obj;
 	if (firstRPL == null) {
 	    if (other.firstRPL != null)
 		return false;

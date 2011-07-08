@@ -66,7 +66,8 @@ Export-Package: .,
  javax.lang.model.type,
  javax.lang.model.util,
  javax.tools,
- sun.tools.javap
+ sun.tools.javap,
+ com.sun.tools.javac.code.dpjizer.substitutions
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.6.0",
