@@ -36,7 +36,7 @@ public class RPLEqualityConstraint implements Constraint {
 
     @Override
     public String toString() {
-	return firstRPL + " should be equal to " + secondRPL;
+	return firstRPL + " = " + secondRPL;
     }
 
     @Override

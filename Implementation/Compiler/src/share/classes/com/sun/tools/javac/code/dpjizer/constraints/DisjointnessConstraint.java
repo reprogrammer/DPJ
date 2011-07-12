@@ -37,7 +37,7 @@ public class DisjointnessConstraint implements Constraint {
 
     @Override
     public String toString() {
-	return firstRPL + " should be disjoint from " + secondRPL;
+	return firstRPL + " # " + secondRPL;
     }
 
     @Override
